@@ -3,1094 +3,898 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Recipe Book">
-<meta name="theme-color" content="#090909">
-<title>📖 The Ultimate Recipe Book</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#0f0f14">
+<title>📖 Ultimate Recipe Book</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-/* ═══ VARIABLES ═══ */
-:root{
-  --bg:#090909; --s1:#111113; --s2:#18181c; --card:#1e1e24;
-  --bdr:#2a2a33; --dim:#3a3a48;
-  --text:#f0ede8; --muted:#68677a; --soft:#a0a0b0;
-  /* section accents */
-  --c-blitz:#ffe234; --c-burger:#f5a623; --c-crispy:#ff4d1a;
-  --c-curry:#e8960a; --c-aufstriche:#6fcf97; --c-tipps:#4ecdc4;
-  /* common */
-  --green:#6fcf97; --mint:#4ecdc4; --lav:#9b8dca; --rose:#ff6b8a;
-  --heat:#ff4d1a; --blue:#5fa8d8;
-}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow-x:hidden}
-body{
-  background:var(--bg);color:var(--text);
-  font-family:'Barlow',sans-serif;font-weight:400;
-  padding-bottom:80px;font-size:15px;
-  -webkit-font-smoothing:antialiased;
+/* ═══════════════════════════ TOKENS ═══════════════════════════ */
+:root {
+  --bg:    #0f0f14;
+  --card:  #1a1a24;
+  --card2: #22222e;
+  --bdr:   #2e2e40;
+  --text:  #f2f0ec;
+  --muted: #6b6b85;
+  --soft:  #9898b0;
+
+/* Section accent colors - vibrant & iOS-friendly */
+–blitz:  #FFD60A; /* bright yellow */
+–burger: #FF9F0A; /* orange */
+–crispy: #FF453A; /* red */
+–curry:  #FF6B35; /* amber-orange */
+–auf:    #32D74B; /* green */
+–tipps:  #64D2FF; /* sky blue */
+
+–safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* ═══ BOTTOM NAV ═══ */
-.nav{
-position:fixed;bottom:0;left:0;right:0;z-index:999;
-background:var(–s1);border-top:1px solid var(–bdr);
-display:flex;padding-bottom:env(safe-area-inset-bottom);
-}
-.nt{
-flex:1;display:flex;flex-direction:column;align-items:center;
-justify-content:center;padding:7px 2px 6px;
-background:none;border:none;cursor:pointer;gap:2px;
-position:relative;
-}
-.nt::after{
-content:’’;position:absolute;top:0;left:20%;right:20%;
-height:2px;border-radius:0 0 3px 3px;
-transform:scaleX(0);transition:transform .22s cubic-bezier(.34,1.56,.64,1);
-}
-.nt.on::after{transform:scaleX(1)}
-.nt[data-s=“blitz”]::after{background:var(–c-blitz)}
-.nt[data-s=“burger”]::after{background:var(–c-burger)}
-.nt[data-s=“crispy”]::after{background:var(–c-crispy)}
-.nt[data-s=“curry”]::after{background:var(–c-curry)}
-.nt[data-s=“aufstriche”]::after{background:var(–c-aufstriche)}
-.nt[data-s=“tipps”]::after{background:var(–c-tipps)}
-.nt-i{font-size:1.15rem;line-height:1;transition:transform .15s}
-.nt.on .nt-i{transform:scale(1.15)}
-.nt-l{
-font-size:0.5rem;font-weight:700;letter-spacing:.07em;
-text-transform:uppercase;color:var(–muted);transition:color .15s;
-}
-.nt.on .nt-l{color:var(–text)}
-.nbadge{
-position:absolute;top:4px;right:calc(50% - 18px);
-font-size:.46rem;font-weight:800;min-width:14px;height:14px;
-border-radius:99px;display:flex;align-items:center;
-justify-content:center;padding:0 3px;color:#000;
-}
-.nt[data-s=“blitz”] .nbadge{background:var(–c-blitz)}
-.nt[data-s=“burger”] .nbadge{background:var(–c-burger)}
-.nt[data-s=“crispy”] .nbadge{background:var(–c-crispy);color:#fff}
-.nt[data-s=“curry”] .nbadge{background:var(–c-curry)}
-.nt[data-s=“aufstriche”] .nbadge{background:var(–c-aufstriche)}
+- { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
 
-/* ═══ PAGES ═══ */
-.pg{display:none;animation:fadeIn .18s ease}
-.pg.on{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+html { background:var(–bg); height:100%; }
 
-/* ═══ SECTION HERO ═══ */
-.hero{padding:0;border-bottom:1px solid var(–bdr);overflow:hidden}
-.hero-stripe{
-padding:5px 16px;display:flex;justify-content:space-between;
-font-family:‘Barlow Condensed’,sans-serif;
-font-size:.6rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;
-}
-.hero-body{padding:18px 16px 20px;position:relative}
-.hero-body::after{
-position:absolute;font-size:130px;opacity:.04;
-right:-10px;bottom:-15px;transform:rotate(10deg);pointer-events:none;
-}
-.hero h2{
-font-family:‘Barlow Condensed’,sans-serif;font-weight:900;
-font-size:clamp(2.4rem,10vw,4.5rem);line-height:.88;
-letter-spacing:-.01em;text-transform:uppercase;
-}
-.hero p{font-size:.76rem;color:var(–muted);margin-top:8px;line-height:1.6}
-.hero-pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
-.hp{
-background:var(–s2);border:1px solid var(–bdr);border-radius:99px;
-padding:3px 10px;font-size:.62rem;font-weight:600;color:var(–muted);
-}
-/* per-section colors */
-.blitz  .hero-stripe{background:var(–c-blitz);color:#000}
-.blitz  .hero h2 span{color:var(–c-blitz)}
-.blitz  .hp.hot{border-color:var(–c-blitz);color:var(–c-blitz)}
-.burger .hero-stripe{background:var(–c-burger);color:#000}
-.burger .hero h2 span{color:var(–c-burger)}
-.burger .hp.hot{border-color:var(–c-burger);color:var(–c-burger)}
-.crispy .hero-stripe{background:var(–c-crispy);color:#fff}
-.crispy .hero h2 span{color:var(–c-crispy)}
-.crispy .hp.hot{border-color:var(–c-crispy);color:var(–c-crispy)}
-.curry  .hero-stripe{background:var(–c-curry);color:#000}
-.curry  .hero h2 span,.curry .hero h2 em{color:var(–c-curry);font-style:italic}
-.curry  .hp.hot{border-color:var(–c-curry);color:var(–c-curry)}
-.aufstriche .hero-stripe{background:var(–c-aufstriche);color:#000}
-.aufstriche .hero h2 span{color:var(–c-aufstriche)}
-.aufstriche .hp.hot{border-color:var(–c-aufstriche);color:var(–c-aufstriche)}
-.tipps .hero-stripe{background:var(–c-tipps);color:#000}
-.tipps .hero h2 span{color:var(–c-tipps)}
-
-/* ═══ FILTER BAR ═══ */
-.fwrap{padding:12px 14px 2px;max-width:720px;margin:0 auto}
-.frow{margin-bottom:8px}
-.flbl{
-font-size:.57rem;font-weight:700;letter-spacing:.15em;
-text-transform:uppercase;color:var(–muted);margin-bottom:5px;
-}
-.fbar{
-display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;
-}
-.fbar::-webkit-scrollbar{display:none}
-.fb{
-flex-shrink:0;background:var(–card);border:1px solid var(–bdr);
-color:var(–muted);padding:5px 12px;border-radius:99px;
-font-family:‘Barlow’,sans-serif;font-size:.7rem;font-weight:600;
-cursor:pointer;transition:all .14s;white-space:nowrap;
-}
-/* active filter states by section */
-.blitz   .fb.on{background:var(–c-blitz);color:#000;border-color:var(–c-blitz)}
-.burger  .fb.on{background:var(–c-burger);color:#000;border-color:var(–c-burger)}
-.crispy  .fb.on{background:var(–c-crispy);color:#fff;border-color:var(–c-crispy)}
-.curry   .fb.on{background:var(–c-curry);color:#000;border-color:var(–c-curry)}
-.aufstriche .fb.on{background:var(–c-aufstriche);color:#000;border-color:var(–c-aufstriche)}
-.fb.on-mint{background:var(–mint);color:#000;border-color:var(–mint)}
-.fb.on-lav{background:var(–lav);color:#fff;border-color:var(–lav)}
-
-/* ═══ COUNT BADGE ═══ */
-.result-count{
-font-size:.65rem;color:var(–muted);padding:4px 14px 6px;
-max-width:720px;margin:0 auto;
-}
-.result-count b{color:var(–text)}
-
-/* ═══ GRID ═══ */
-.grid{
-display:flex;flex-direction:column;gap:7px;
-padding:0 14px 16px;max-width:720px;margin:0 auto;
-}
-@media(min-width:520px){.grid{display:grid;grid-template-columns:1fr 1fr}}
-
-/* ═══ CARD ═══ */
-.card{
-background:var(–card);border:1px solid var(–bdr);
-border-radius:12px;overflow:hidden;cursor:pointer;
-transition:border-color .15s;position:relative;
-}
-.card::before{
-content:’’;position:absolute;left:0;top:0;bottom:0;
-width:3px;border-radius:0;
-}
-/* section accent on left edge */
-.blitz   .card::before{background:var(–c-blitz)}
-.burger  .card::before{background:var(–c-burger)}
-.crispy  .card::before{background:var(–c-crispy)}
-.curry   .card::before{background:var(–c-curry)}
-.aufstriche .card::before{background:var(–c-aufstriche)}
-/* variant overrides */
-.card.gourmet::before{background:var(–lav)!important}
-.card.healthy::before{background:var(–green)!important}
-/* open states */
-.blitz   .card.on{border-color:var(–c-blitz)}
-.burger  .card.on{border-color:var(–c-burger)}
-.crispy  .card.on{border-color:var(–c-crispy)}
-.curry   .card.on{border-color:var(–c-curry)}
-.aufstriche .card.on{border-color:var(–c-aufstriche)}
-.card.gourmet.on{border-color:var(–lav)!important}
-.card.healthy.on{border-color:var(–green)!important}
-
-/* card header */
-.chd{
-padding:12px 13px 12px 17px;
-display:flex;align-items:center;gap:10px;
-user-select:none;
-}
-.cnum{
-font-family:‘Barlow Condensed’,sans-serif;font-weight:800;
-font-size:1rem;color:var(–bdr);min-width:22px;
-text-align:center;flex-shrink:0;line-height:1;
-transition:color .15s;
-}
-.card.on .cnum{color:var(–soft)}
-.cico{
-font-size:1.4rem;width:40px;height:40px;background:var(–s2);
-border-radius:8px;display:flex;align-items:center;
-justify-content:center;flex-shrink:0;
-}
-.cinf{flex:1;min-width:0}
-.ctitle{
-font-family:‘Barlow Condensed’,sans-serif;font-weight:700;
-font-size:.95rem;letter-spacing:.01em;color:var(–text);line-height:1.2;
-}
-.csub{font-size:.69rem;color:var(–muted);margin-top:2px;line-height:1.4}
-.ctags{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
-.tag{
-font-size:.58rem;padding:2px 7px;border-radius:99px;
-font-weight:700;letter-spacing:.04em;
-}
-/* tag color classes */
-.ty{background:rgba(255,226,52,.14);color:var(–c-blitz)}
-.tb{background:rgba(245,166,35,.14);color:var(–c-burger)}
-.tr{background:rgba(255,77,26,.18);color:var(–c-crispy)}
-.ts{background:rgba(232,150,10,.15);color:var(–c-curry)}
-.tg{background:rgba(111,207,151,.16);color:var(–green)}
-.tm{background:rgba(78,205,196,.16);color:var(–mint)}
-.tl{background:rgba(155,141,202,.18);color:var(–lav)}
-.tk{background:rgba(255,107,138,.18);color:var(–rose)}
-.tw{background:rgba(240,238,232,.08);color:var(–soft)}
-/* badge aliases from old data */
-.b-gold,.badge-gold{background:rgba(255,226,52,.14);color:var(–c-blitz)}
-.b-orange,.b-saffron,.badge-saffron{background:rgba(232,150,10,.15);color:var(–c-curry)}
-.b-red,.b-chili,.badge-fire{background:rgba(255,77,26,.18);color:var(–c-crispy)}
-.b-green,.b-mint,.badge-green{background:rgba(111,207,151,.16);color:var(–green)}
-.b-blue,.badge-blue{background:rgba(95,168,216,.18);color:var(–blue)}
-.b-cream,.badge-cream{background:rgba(240,238,232,.08);color:var(–soft)}
-.b-heart,.badge-heart{background:rgba(78,205,196,.16);color:var(–mint)}
-.b-turmeric{background:rgba(232,150,10,.15);color:var(–c-curry)}
-
-.chev{
-color:var(–muted);font-size:.75rem;
-transition:transform .28s ease;flex-shrink:0;
-}
-.card.on .chev{transform:rotate(180deg)}
-
-/* card body – CSS accordion */
-.cbd{max-height:0;overflow:hidden;transition:max-height .38s cubic-bezier(.4,0,.2,1)}
-.card.on .cbd{max-height:3600px}
-.cin{padding:12px 13px 16px 17px;border-top:1px solid var(–bdr)}
-
-/* ═══ PORTION SELECTOR ═══ */
-.portion{
-display:flex;align-items:center;gap:8px;
-background:var(–s2);border:1px solid var(–bdr);
-border-radius:8px;padding:6px 12px;margin-bottom:12px;
-}
-.portion-lbl{font-size:.65rem;font-weight:600;color:var(–muted);flex:1}
-.portion-btn{
-background:var(–dim);border:none;color:var(–text);
-width:28px;height:28px;border-radius:6px;font-size:1.1rem;
-cursor:pointer;display:flex;align-items:center;justify-content:center;
-font-weight:700;transition:background .12s;flex-shrink:0;
-}
-.portion-btn:active{filter:brightness(1.3)}
-.portion-val{
-font-family:‘Barlow Condensed’,sans-serif;font-weight:800;
-font-size:1.15rem;color:var(–c-blitz);min-width:22px;text-align:center;
-}
-.blitz   .portion-val{color:var(–c-blitz)}
-.burger  .portion-val{color:var(–c-burger)}
-.crispy  .portion-val{color:var(–c-crispy)}
-.curry   .portion-val{color:var(–c-curry)}
-.aufstriche .portion-val{color:var(–c-aufstriche)}
-
-/* ═══ LABELS ═══ */
-.lbl{
-font-size:.57rem;font-weight:700;letter-spacing:.16em;
-text-transform:uppercase;margin:12px 0 7px;
-}
-.lbl:first-child{margin-top:0}
-.blitz   .lbl{color:var(–c-blitz)}
-.burger  .lbl{color:var(–c-burger)}
-.crispy  .lbl{color:var(–c-crispy)}
-.curry   .lbl{color:var(–c-curry)}
-.aufstriche .lbl{color:var(–c-aufstriche)}
-.tipps   .lbl{color:var(–c-tipps)}
-.card.gourmet .lbl{color:var(–lav)}
-.card.healthy .lbl{color:var(–green)}
-
-/* info box */
-.ibox{
-background:var(–s2);border:1px solid var(–bdr);
-border-radius:7px;padding:10px 12px;margin-bottom:8px;
-}
-.ibox .lbl{margin-top:0}
-
-/* aufbau stack */
-.aufbau{display:flex;flex-direction:column-reverse;gap:2px;margin:6px 0 4px}
-.alayer{
-display:flex;align-items:center;gap:8px;
-font-size:.76rem;color:var(–muted);
-padding:4px 0;border-bottom:1px solid var(–bdr);
-}
-.alayer:first-child{border-bottom:none}
-.al-e{font-size:.9rem;width:20px;text-align:center;flex-shrink:0}
-.al-n{flex:1;color:var(–text);font-weight:500}
-.al-t{font-size:.63rem;color:var(–muted);font-style:italic}
-
-/* tables */
-table{width:100%;border-collapse:collapse;font-size:.8rem}
-tr{border-bottom:1px solid var(–bdr)}
-tr:last-child{border-bottom:none}
-td{padding:5px 3px;line-height:1.3}
-td:first-child{color:var(–text);font-weight:500}
-td.qty{font-weight:700;text-align:right;white-space:nowrap;padding-left:10px}
-.blitz    td.qty{color:var(–c-blitz)}
-.burger   td.qty{color:var(–c-burger)}
-.crispy   td.qty{color:var(–c-crispy)}
-.curry    td.qty{color:var(–c-curry)}
-.aufstriche td.qty{color:var(–c-aufstriche)}
-.card.gourmet td.qty{color:var(–lav)}
-.card.healthy td.qty{color:var(–green)}
-
-/* steps */
-ol{list-style:none;counter-reset:s;padding:0}
-ol li{
-counter-increment:s;display:flex;gap:9px;
-font-size:.78rem;color:var(–muted);line-height:1.55;
-padding:6px 0;border-bottom:1px solid var(–bdr);
-}
-ol li:last-child{border-bottom:none}
-ol li::before{
-content:counter(s);
-font-family:‘Barlow Condensed’,sans-serif;font-weight:800;
-font-size:.62rem;min-width:20px;height:20px;border-radius:4px;
-display:flex;align-items:center;justify-content:center;
-flex-shrink:0;margin-top:2px;color:#000;
-}
-.blitz    ol li::before{background:var(–c-blitz)}
-.burger   ol li::before{background:var(–c-burger)}
-.crispy   ol li::before{background:var(–c-crispy);color:#fff}
-.curry    ol li::before{background:var(–c-curry)}
-.aufstriche ol li::before{background:var(–c-aufstriche)}
-.card.gourmet ol li::before{background:var(–lav);color:#fff}
-.card.healthy ol li::before{background:var(–green)}
-ol li strong{color:var(–text)}
-
-/* tip */
-.tip{
-background:var(–s2);padding:8px 12px;font-size:.73rem;
-color:var(–muted);margin-top:10px;line-height:1.55;
-border-radius:0 6px 6px 0;border-left:3px solid var(–bdr);
-}
-.blitz    .tip{border-left-color:var(–c-blitz)}
-.burger   .tip{border-left-color:var(–c-burger)}
-.crispy   .tip{border-left-color:var(–c-crispy)}
-.curry    .tip{border-left-color:var(–c-curry)}
-.aufstriche .tip{border-left-color:var(–c-aufstriche)}
-.card.gourmet .tip{border-left-color:var(–lav)}
-.card.healthy .tip{border-left-color:var(–green)}
-
-/* health box */
-.hbox{
-background:rgba(111,207,151,.07);border:1px solid rgba(111,207,151,.2);
-border-radius:6px;padding:7px 10px;font-size:.7rem;
-color:var(–green);margin-top:8px;line-height:1.5;
+body {
+background:var(–bg);
+color:var(–text);
+font-family:‘Nunito Sans’, sans-serif;
+font-size:15px;
+min-height:100%;
+/* Space for fixed bottom nav */
+padding-bottom: calc(64px + var(–safe-bottom));
+-webkit-font-smoothing:antialiased;
 }
 
-/* device badges */
-.dbadge{
-display:inline-flex;align-items:center;gap:4px;
-background:var(–s2);border:1px solid var(–bdr);
-border-radius:5px;padding:3px 8px;font-size:.61rem;
-font-weight:600;color:var(–muted);margin:0 5px 8px 0;
+/* ═══════════════════════════ PAGES ════════════════════════════ */
+.page { display:none; }
+.page.active { display:block; animation: fadeup .2s ease; }
+@keyframes fadeup { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+
+/* ═══════════════════════════ BOTTOM NAV ═══════════════════════ */
+#nav {
+position: fixed;
+bottom: 0;
+left: 0;
+right: 0;
+z-index: 9999;
+background: #16161f;
+border-top: 1px solid var(–bdr);
+display: flex;
+align-items: stretch;
+padding-bottom: var(–safe-bottom);
+/* Force visibility */
+visibility: visible !important;
+opacity: 1 !important;
 }
 
-/* makro row */
-.mkrow{display:flex;gap:5px;flex-wrap:wrap;margin:6px 0 10px}
-.mk{
-font-size:.6rem;padding:2px 8px;border-radius:99px;
-font-weight:700;border:1px solid;
+.nav-btn {
+flex: 1;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+padding: 8px 2px 6px;
+background: none;
+border: none;
+cursor: pointer;
+gap: 3px;
+position: relative;
+min-height: 56px;
 }
-.mk-p{background:rgba(255,77,26,.1);border-color:rgba(255,77,26,.3);color:var(–c-crispy)}
-.mk-k{background:rgba(255,226,52,.1);border-color:rgba(255,226,52,.3);color:var(–c-blitz)}
-.mk-f{background:rgba(78,205,196,.1);border-color:rgba(78,205,196,.3);color:var(–mint)}
+.nav-btn::after {
+content: ‘’;
+position: absolute;
+top: 0; left: 10%; right: 10%;
+height: 2px;
+border-radius: 0 0 2px 2px;
+transform: scaleX(0);
+transition: transform .2s cubic-bezier(.34,1.4,.64,1);
+}
+.nav-btn.on::after { transform: scaleX(1); }
+.nav-btn[data-p=“home”]::after    { background: #fff; }
+.nav-btn[data-p=“blitz”]::after   { background: var(–blitz); }
+.nav-btn[data-p=“burger”]::after  { background: var(–burger); }
+.nav-btn[data-p=“crispy”]::after  { background: var(–crispy); }
+.nav-btn[data-p=“curry”]::after   { background: var(–curry); }
+.nav-btn[data-p=“auf”]::after     { background: var(–auf); }
+.nav-btn[data-p=“tipps”]::after   { background: var(–tipps); }
 
-/* ═══ SECTION DIVIDER ═══ */
-.sdiv{
-max-width:720px;margin:0 auto;padding:14px 14px 8px;
-display:flex;align-items:center;gap:10px;
+.nav-ico { font-size: 1.25rem; line-height:1; transition: transform .15s; }
+.nav-btn.on .nav-ico { transform: scale(1.15); }
+.nav-lbl {
+font-size: 0.48rem;
+font-weight: 800;
+letter-spacing: .06em;
+text-transform: uppercase;
+color: var(–muted);
+transition: color .15s;
 }
-.sdiv-t{
-font-family:‘Barlow Condensed’,sans-serif;font-weight:700;
-font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;
-white-space:nowrap;
+.nav-btn.on .nav-lbl { color: var(–text); }
+.nav-badge {
+position: absolute;
+top: 5px; right: calc(50% - 20px);
+font-size: .42rem; font-weight: 900;
+height: 13px; min-width: 13px;
+border-radius: 99px;
+display: flex; align-items: center; justify-content: center;
+padding: 0 3px; color: #000;
 }
-.blitz   .sdiv-t{color:var(–c-blitz)}
-.burger  .sdiv-t{color:var(–c-burger)}
-.crispy  .sdiv-t{color:var(–c-crispy)}
-.curry   .sdiv-t{color:var(–c-curry)}
-.aufstriche .sdiv-t{color:var(–c-aufstriche)}
-.tipps   .sdiv-t{color:var(–c-tipps)}
-.sdiv-l{flex:1;height:1px;background:var(–bdr)}
+.nav-btn[data-p=“blitz”]  .nav-badge { background: var(–blitz); }
+.nav-btn[data-p=“burger”] .nav-badge { background: var(–burger); }
+.nav-btn[data-p=“crispy”] .nav-badge { background: var(–crispy); color:#fff; }
+.nav-btn[data-p=“curry”]  .nav-badge { background: var(–curry); }
+.nav-btn[data-p=“auf”]    .nav-badge { background: var(–auf); }
 
-/* ═══ SAUCE GRID ═══ */
-.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:0 14px;max-width:720px;margin:0 auto}
-.sc{
-background:var(–card);border:1px solid var(–bdr);
-border-radius:8px;overflow:hidden;cursor:pointer;
+/* ═══════════════════════════ HERO ═════════════════════════════ */
+.hero {
+padding: 0;
+border-bottom: 1px solid var(–bdr);
 }
-.burger .sc.on{border-color:var(–c-burger)}
-.crispy .sc.on{border-color:var(–c-crispy)}
-.sc-hd{padding:10px 11px;display:flex;align-items:center;gap:7px}
-.sc-em{
-font-size:1.2rem;width:30px;height:30px;background:var(–s2);
-border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+.hero-bar {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 5px 16px;
+font-family: ‘Nunito’, sans-serif;
+font-size: .57rem;
+font-weight: 800;
+letter-spacing: .2em;
+text-transform: uppercase;
+color: #000;
 }
-.sc-inf{flex:1;min-width:0}
-.sc-t{font-family:‘Barlow Condensed’,sans-serif;font-weight:700;font-size:.78rem;color:var(–text);line-height:1.2}
-.sc-s{font-size:.6rem;color:var(–muted)}
-.sc-heat{
-font-size:.58rem;font-weight:700;margin-top:2px;
-display:inline-block;padding:1px 5px;border-radius:3px;
-background:rgba(255,77,26,.12);color:var(–c-crispy);
+.hero-body { padding: 18px 16px 20px; }
+.hero-title {
+font-family: ‘Nunito’, sans-serif;
+font-weight: 900;
+font-size: clamp(2.2rem,9vw,4rem);
+line-height: .9;
+text-transform: uppercase;
+letter-spacing: -.02em;
+color: var(–text);
 }
-.sc-chev{font-size:.7rem;color:var(–muted);transition:transform .22s;flex-shrink:0}
-.sc.on .sc-chev{transform:rotate(180deg)}
-.sc-bd{max-height:0;overflow:hidden;transition:max-height .32s ease}
-.sc.on .sc-bd{max-height:600px}
-.sc-in{padding:0 11px 11px;border-top:1px solid var(–bdr);font-size:.74rem}
-.sc-in .lbl{margin-top:9px}
-.sc-in p{font-size:.73rem;color:var(–muted);line-height:1.6;padding:4px 0 7px}
+.hero-sub { font-size: .74rem; color: var(–muted); margin-top: 8px; line-height: 1.6; }
+.hero-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+.pill {
+background: var(–card2);
+border: 1px solid var(–bdr);
+border-radius: 99px;
+padding: 3px 10px;
+font-size: .6rem;
+font-weight: 700;
+color: var(–soft);
+}
 
-/* ═══ TIP BOXES ═══ */
-.tipbox{
-background:var(–card);border:1px solid var(–bdr);
-border-radius:10px;overflow:hidden;margin-bottom:8px;
+/* Per-section hero bar colors */
+.sec-blitz  .hero-bar { background: var(–blitz); }
+.sec-burger .hero-bar { background: var(–burger); }
+.sec-crispy .hero-bar { background: var(–crispy); color:#fff; }
+.sec-curry  .hero-bar { background: var(–curry); }
+.sec-auf    .hero-bar { background: var(–auf); }
+.sec-tipps  .hero-bar { background: var(–tipps); }
+
+.sec-blitz  .hero-title em { color: var(–blitz); font-style:normal; }
+.sec-burger .hero-title em { color: var(–burger); font-style:normal; }
+.sec-crispy .hero-title em { color: var(–crispy); font-style:normal; }
+.sec-curry  .hero-title em { color: var(–curry); font-style:normal; }
+.sec-auf    .hero-title em { color: var(–auf); font-style:normal; }
+.sec-tipps  .hero-title em { color: var(–tipps); font-style:normal; }
+
+.sec-blitz  .pill.hl { border-color:var(–blitz); color:var(–blitz); }
+.sec-burger .pill.hl { border-color:var(–burger); color:var(–burger); }
+.sec-crispy .pill.hl { border-color:var(–crispy); color:var(–crispy); }
+.sec-curry  .pill.hl { border-color:var(–curry); color:var(–curry); }
+.sec-auf    .pill.hl { border-color:var(–auf); color:var(–auf); }
+.sec-tipps  .pill.hl { border-color:var(–tipps); color:var(–tipps); }
+
+/* ═══════════════════════════ SUB-TABS ═════════════════════════ */
+.subtabs {
+display: flex;
+gap: 6px;
+padding: 10px 14px 4px;
+max-width: 720px;
+margin: 0 auto;
 }
-.tipbox-hd{
-padding:11px 14px;display:flex;align-items:center;gap:9px;
-background:var(–s2);cursor:pointer;user-select:none;
+.stab {
+flex: 1;
+padding: 8px 4px;
+text-align: center;
+cursor: pointer;
+background: var(–card);
+border: 1px solid var(–bdr);
+border-radius: 10px;
+font-family: ‘Nunito’, sans-serif;
+font-size: .68rem;
+font-weight: 800;
+color: var(–muted);
+transition: all .15s;
 }
-.tipbox-hd .ico{font-size:1.25rem}
-.tipbox-hd .ttl{
-font-family:‘Barlow Condensed’,sans-serif;font-weight:700;
-font-size:.82rem;letter-spacing:.02em;flex:1;
+.sec-burger .stab.on { background:var(–burger); border-color:var(–burger); color:#000; }
+.sec-crispy .stab.on { background:var(–crispy); border-color:var(–crispy); color:#fff; }
+
+/* ═══════════════════════════ FILTERS ══════════════════════════ */
+.fwrap { padding: 10px 14px 4px; max-width: 720px; margin: 0 auto; }
+.frow  { margin-bottom: 8px; }
+.flbl  {
+font-size: .52rem;
+font-weight: 800;
+letter-spacing: .15em;
+text-transform: uppercase;
+color: var(–muted);
+margin-bottom: 5px;
 }
-.tipbox-chev{font-size:.72rem;color:var(–muted);transition:transform .22s}
-.tipbox.on .tipbox-chev{transform:rotate(180deg)}
-.tipbox-bd{max-height:0;overflow:hidden;transition:max-height .35s ease}
-.tipbox.on .tipbox-bd{max-height:700px}
-.tip-item{
-display:flex;gap:9px;padding:7px 14px;
-font-size:.74rem;color:var(–muted);line-height:1.5;
+.fbar {
+display: flex;
+gap: 5px;
+overflow-x: auto;
+scrollbar-width: none;
+padding-bottom: 2px;
+}
+.fbar::-webkit-scrollbar { display: none; }
+.fbtn {
+flex-shrink: 0;
+background: var(–card);
+border: 1px solid var(–bdr);
+color: var(–muted);
+padding: 5px 11px;
+border-radius: 99px;
+font-family: ‘Nunito Sans’, sans-serif;
+font-size: .67rem;
+font-weight: 700;
+cursor: pointer;
+transition: all .12s;
+white-space: nowrap;
+}
+.sec-blitz  .fbtn.on { background:var(–blitz);  border-color:var(–blitz);  color:#000; }
+.sec-burger .fbtn.on { background:var(–burger); border-color:var(–burger); color:#000; }
+.sec-crispy .fbtn.on { background:var(–crispy); border-color:var(–crispy); color:#fff; }
+.sec-curry  .fbtn.on { background:var(–curry);  border-color:var(–curry);  color:#000; }
+.sec-auf    .fbtn.on { background:var(–auf);    border-color:var(–auf);    color:#000; }
+
+/* ═══════════════════════════ GRID ═════════════════════════════ */
+.grid {
+display: flex;
+flex-direction: column;
+gap: 7px;
+padding: 8px 14px 16px;
+max-width: 720px;
+margin: 0 auto;
+}
+@media(min-width:520px) {
+.grid { display:grid; grid-template-columns:1fr 1fr; }
+}
+
+/* ═══════════════════════════ CARD ══════════════════════════════ */
+.card {
+background: var(–card);
+border: 1.5px solid var(–bdr);
+border-radius: 14px;
+overflow: hidden;
+cursor: pointer;
+transition: border-color .15s;
+position: relative;
+}
+.card::before {
+content: ‘’;
+position: absolute;
+left: 0; top: 0; bottom: 0;
+width: 3px;
+border-radius: 3px 0 0 3px;
+}
+.sec-blitz  .card::before { background: var(–blitz); }
+.sec-burger .card::before { background: var(–burger); }
+.sec-crispy .card::before { background: var(–crispy); }
+.sec-curry  .card::before { background: var(–curry); }
+.sec-auf    .card::before { background: var(–auf); }
+
+.card.open { }
+.sec-blitz  .card.open { border-color:var(–blitz); }
+.sec-burger .card.open { border-color:var(–burger); }
+.sec-crispy .card.open { border-color:var(–crispy); }
+.sec-curry  .card.open { border-color:var(–curry); }
+.sec-auf    .card.open { border-color:var(–auf); }
+.card.ldl-card::before { background: var(–auf) !important; }
+.card.ldl-card.open    { border-color:var(–auf) !important; }
+
+/* Card header */
+.card-hd {
+padding: 11px 12px 11px 16px;
+display: flex;
+align-items: center;
+gap: 10px;
+user-select: none;
+}
+.card-ico {
+font-size: 1.35rem;
+width: 40px; height: 40px;
+background: var(–card2);
+border-radius: 9px;
+display: flex; align-items:center; justify-content:center;
+flex-shrink: 0;
+}
+.card-inf { flex: 1; min-width: 0; }
+.card-title {
+font-family: ‘Nunito’, sans-serif;
+font-weight: 800;
+font-size: .88rem;
+color: var(–text);
+line-height: 1.2;
+}
+.card-sub { font-size: .65rem; color: var(–muted); margin-top: 2px; line-height: 1.4; }
+.card-tags { display:flex; gap:4px; flex-wrap:wrap; margin-top:5px; }
+.tag {
+font-size: .55rem; padding: 2px 7px;
+border-radius: 99px; font-weight: 700;
+letter-spacing: .04em;
+}
+.ty { background:rgba(255,214,10,.14); color:var(–blitz); }
+.to { background:rgba(255,159,10,.14); color:var(–burger); }
+.tr { background:rgba(255,69,58,.16);  color:var(–crispy); }
+.ta { background:rgba(255,107,53,.15); color:var(–curry); }
+.tg { background:rgba(50,215,75,.14);  color:var(–auf); }
+.tb { background:rgba(100,210,255,.14);color:var(–tipps); }
+.tw { background:rgba(255,255,255,.07);color:var(–soft); }
+/* badge aliases */
+.b-gold,.badge-gold { background:rgba(255,214,10,.14); color:var(–blitz); }
+.b-orange,.b-saffron { background:rgba(255,107,53,.15); color:var(–curry); }
+.b-red,.badge-fire { background:rgba(255,69,58,.16); color:var(–crispy); }
+.b-green,.badge-green,.b-mint { background:rgba(50,215,75,.14); color:var(–auf); }
+.b-blue,.badge-blue { background:rgba(100,210,255,.14); color:var(–tipps); }
+.b-heart,.badge-heart { background:rgba(50,215,75,.14); color:var(–auf); }
+.b-cream,.b-turmeric { background:rgba(255,255,255,.07); color:var(–soft); }
+
+.card-chev {
+color: var(–muted);
+font-size: .7rem;
+transition: transform .28s ease;
+flex-shrink: 0;
+}
+.card.open .card-chev { transform: rotate(180deg); }
+
+/* Card body - CSS accordion */
+.card-bd {
+max-height: 0;
+overflow: hidden;
+transition: max-height .38s cubic-bezier(.4,0,.2,1);
+}
+.card.open .card-bd { max-height: 4000px; }
+.card-in {
+padding: 12px 13px 16px 16px;
+border-top: 1px solid var(–bdr);
+}
+
+/* ═══════════════════════════ PORTIONS ═════════════════════════ */
+.portions {
+display: flex;
+align-items: center;
+gap: 8px;
+background: var(–card2);
+border: 1px solid var(–bdr);
+border-radius: 9px;
+padding: 6px 12px;
+margin-bottom: 12px;
+}
+.por-lbl { font-size:.62rem; font-weight:700; color:var(–muted); flex:1; }
+.por-btn {
+background: var(–bdr);
+border: none;
+color: var(–text);
+width: 28px; height: 28px;
+border-radius: 7px;
+font-size: 1.1rem;
+font-weight: 800;
+cursor: pointer;
+display:flex; align-items:center; justify-content:center;
+flex-shrink: 0;
+}
+.por-val {
+font-family:‘Nunito’,sans-serif;
+font-weight: 900;
+font-size: 1.1rem;
+min-width: 22px;
+text-align: center;
+}
+.sec-blitz  .por-val { color:var(–blitz); }
+.sec-burger .por-val { color:var(–burger); }
+.sec-crispy .por-val { color:var(–crispy); }
+.sec-curry  .por-val { color:var(–curry); }
+.sec-auf    .por-val { color:var(–auf); }
+
+/* ═══════════════════════════ LABELS ═══════════════════════════ */
+.lbl {
+font-size: .52rem;
+font-weight: 800;
+letter-spacing: .15em;
+text-transform: uppercase;
+margin: 12px 0 7px;
+}
+.lbl:first-child { margin-top: 0; }
+.sec-blitz  .lbl { color:var(–blitz); }
+.sec-burger .lbl { color:var(–burger); }
+.sec-crispy .lbl { color:var(–crispy); }
+.sec-curry  .lbl { color:var(–curry); }
+.sec-auf    .lbl { color:var(–auf); }
+.sec-tipps  .lbl { color:var(–tipps); }
+.card.ldl-card .lbl { color:var(–auf) !important; }
+
+/* ═══════════════════════════ TABLE ════════════════════════════ */
+table { width:100%; border-collapse:collapse; font-size:.78rem; }
+tr { border-bottom:1px solid var(–bdr); }
+tr:last-child { border-bottom:none; }
+td { padding:5px 2px; line-height:1.3; }
+td:first-child { color:var(–text); font-weight:600; }
+td.amt { font-weight:800; text-align:right; padding-left:8px; white-space:nowrap; }
+.sec-blitz  td.amt { color:var(–blitz); }
+.sec-burger td.amt { color:var(–burger); }
+.sec-crispy td.amt { color:var(–crispy); }
+.sec-curry  td.amt { color:var(–curry); }
+.sec-auf    td.amt { color:var(–auf); }
+.card.ldl-card td.amt { color:var(–auf) !important; }
+
+/* ═══════════════════════════ STEPS ════════════════════════════ */
+ol { list-style:none; counter-reset:step; padding:0; }
+ol li {
+counter-increment:step;
+display:flex; gap:9px;
+font-size:.76rem; color:var(–muted);
+line-height:1.55; padding:6px 0;
 border-bottom:1px solid var(–bdr);
 }
-.tip-item:last-child{border-bottom:none}
-.tip-num{font-family:‘Barlow Condensed’,sans-serif;font-weight:700;min-width:16px;font-size:.65rem;margin-top:1px}
+ol li:last-child { border-bottom:none; }
+ol li::before {
+content:counter(step);
+font-family:‘Nunito’,sans-serif; font-weight:900;
+font-size:.58rem; min-width:20px; height:20px;
+border-radius:5px;
+display:flex; align-items:center; justify-content:center;
+flex-shrink:0; margin-top:2px; color:#000;
+}
+.sec-blitz  ol li::before { background:var(–blitz); }
+.sec-burger ol li::before { background:var(–burger); }
+.sec-crispy ol li::before { background:var(–crispy); color:#fff; }
+.sec-curry  ol li::before { background:var(–curry); }
+.sec-auf    ol li::before { background:var(–auf); }
+.card.ldl-card ol li::before { background:var(–auf) !important; }
+ol li strong { color:var(–text); }
 
-/* ═══ PANADEN GUIDE ═══ */
-.pan-card{
-background:var(–card);border:1px solid var(–bdr);border-radius:10px;
-overflow:hidden;cursor:pointer;margin-bottom:8px;
+/* ═══════════════════════════ TIP / INFO BOX ═══════════════════ */
+.tip {
+margin-top: 10px;
+padding: 8px 11px;
+font-size: .71rem;
+color: var(–muted);
+line-height: 1.55;
+border-left: 3px solid var(–bdr);
+border-radius: 0 6px 6px 0;
+background: var(–card2);
 }
-.pan-card-hd{padding:12px 14px;display:flex;align-items:center;gap:10px}
-.pan-basis{
-background:rgba(78,205,196,.07);border:1px solid rgba(78,205,196,.2);
-border-radius:6px;padding:7px 10px;font-size:.7rem;
-color:var(–mint);margin-bottom:10px;line-height:1.5;
-}
+.sec-blitz  .tip { border-left-color:var(–blitz); }
+.sec-burger .tip { border-left-color:var(–burger); }
+.sec-crispy .tip { border-left-color:var(–crispy); }
+.sec-curry  .tip { border-left-color:var(–curry); }
+.sec-auf    .tip { border-left-color:var(–auf); }
 
-/* ═══ HOME SPLASH ═══ */
-.splash{
-min-height:calc(100vh - 70px);display:flex;flex-direction:column;
-align-items:center;justify-content:center;
-padding:30px 18px;text-align:center;position:relative;overflow:hidden;
+.ibox {
+background:var(–card2); border:1px solid var(–bdr);
+border-radius:8px; padding:10px 12px; margin-bottom:8px;
 }
-.splash::before{
-content:‘📖’;position:absolute;font-size:260px;opacity:.025;
-top:50%;left:50%;transform:translate(-50%,-55%);pointer-events:none;
+.ibox .lbl { margin-top:0; }
+.ldl-box {
+background:rgba(50,215,75,.07);
+border:1px solid rgba(50,215,75,.25);
+border-radius:7px; padding:7px 10px;
+font-size:.69rem; color:var(–auf);
+margin-top:8px; line-height:1.5;
 }
-.splash-title{
-font-family:‘Barlow Condensed’,sans-serif;font-weight:900;text-transform:uppercase;
-font-size:clamp(2.8rem,12vw,5.5rem);line-height:.88;letter-spacing:-.02em;
-color:var(–text);margin-bottom:14px;
+.dev-badge {
+display:inline-flex; align-items:center; gap:4px;
+background:var(–card2); border:1px solid var(–bdr);
+border-radius:5px; padding:3px 8px;
+font-size:.6rem; font-weight:700; color:var(–muted);
+margin:0 4px 6px 0;
 }
-.splash-title .y{color:var(–c-blitz)}
-.splash-title .o{color:var(–c-crispy)}
-.splash-title .g{color:var(–c-curry)}
-.splash-sub{font-size:.8rem;color:var(–muted);line-height:1.7;max-width:300px;margin:0 auto 22px}
-.splash-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:360px}
-.splash-card{
-background:var(–s2);border:1px solid var(–bdr);border-radius:10px;
-padding:14px 10px;cursor:pointer;transition:transform .15s,border-color .15s;
-display:flex;flex-direction:column;align-items:center;gap:5px;
+.aufbau { display:flex; flex-direction:column-reverse; gap:2px; margin:6px 0 4px; }
+.alayer {
+display:flex; align-items:center; gap:7px;
+font-size:.73rem; color:var(–muted);
+padding:4px 0; border-bottom:1px solid var(–bdr);
 }
-.splash-card:active{transform:scale(.97)}
-.splash-card .ico{font-size:1.7rem}
-.splash-card .lbl2{
-font-family:‘Barlow Condensed’,sans-serif;font-weight:700;
-font-size:.74rem;color:var(–text);text-align:center;line-height:1.2;letter-spacing:.02em;
-}
-.splash-card .cnt{font-size:.6rem;color:var(–muted);font-weight:500}
-.splash-card.c1{border-color:rgba(255,226,52,.25)}
-.splash-card.c2{border-color:rgba(245,166,35,.25)}
-.splash-card.c3{border-color:rgba(255,77,26,.25)}
-.splash-card.c4{border-color:rgba(232,150,10,.25)}
-.splash-card.c5{border-color:rgba(111,207,151,.25)}
-.splash-card.c6{border-color:rgba(78,205,196,.25)}
+.alayer:first-child { border-bottom:none; }
+.al-e { width:20px; text-align:center; flex-shrink:0; font-size:.9rem; }
+.al-n { flex:1; color:var(–text); font-weight:600; }
+.al-t { font-size:.6rem; color:var(–muted); }
+.mkrow { display:flex; gap:5px; flex-wrap:wrap; margin:5px 0 10px; }
+.mk { font-size:.58rem; padding:2px 8px; border-radius:99px; font-weight:700; border:1px solid; }
+.mk-p { background:rgba(255,69,58,.1); border-color:rgba(255,69,58,.3); color:var(–crispy); }
+.mk-k { background:rgba(255,214,10,.1); border-color:rgba(255,214,10,.3); color:var(–blitz); }
+.mk-f { background:rgba(50,215,75,.1); border-color:rgba(50,215,75,.3); color:var(–auf); }
 
-/* random button */
-.random-btn{
-margin:16px auto 0;display:flex;align-items:center;gap:8px;
-background:var(–s2);border:1px solid var(–bdr);border-radius:99px;
-padding:8px 20px;font-size:.78rem;font-weight:600;color:var(–soft);
-cursor:pointer;transition:all .15s;
-}
-.random-btn:active{background:var(–card);transform:scale(.97)}
+/* ═══════════════════════════ SAUCE GRID ═══════════════════════ */
+.sgrid { display:grid; grid-template-columns:1fr 1fr; gap:7px; padding:0 14px 8px; max-width:720px; margin:0 auto; }
+.sc { background:var(–card); border:1.5px solid var(–bdr); border-radius:10px; overflow:hidden; cursor:pointer; }
+.sec-burger .sc.open { border-color:var(–burger); }
+.sec-crispy .sc.open { border-color:var(–crispy); }
+.sc-hd { padding:9px 10px; display:flex; align-items:center; gap:7px; }
+.sc-em { font-size:1.15rem; width:28px; height:28px; background:var(–card2); border-radius:5px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.sc-inf { flex:1; min-width:0; }
+.sc-t { font-family:‘Nunito’,sans-serif; font-weight:800; font-size:.72rem; color:var(–text); line-height:1.2; }
+.sc-s { font-size:.58rem; color:var(–muted); }
+.sc-heat { font-size:.56rem; font-weight:700; padding:1px 5px; border-radius:3px; margin-top:2px; display:inline-block; background:rgba(255,69,58,.12); color:var(–crispy); }
+.sc-chev { font-size:.65rem; color:var(–muted); transition:transform .2s; flex-shrink:0; }
+.sc.open .sc-chev { transform:rotate(180deg); }
+.sc-bd { max-height:0; overflow:hidden; transition:max-height .3s ease; }
+.sc.open .sc-bd { max-height:500px; }
+.sc-in { padding:0 10px 10px; border-top:1px solid var(–bdr); font-size:.72rem; }
+.sc-in .lbl { margin-top:9px; }
+.sc-in p { font-size:.71rem; color:var(–muted); line-height:1.6; padding:3px 0 6px; }
 
-/* ═══ BURGER SUB-TABS ═══ */
-.subtabs{
-display:flex;gap:6px;padding:10px 14px 4px;
-max-width:720px;margin:0 auto;
-}
-.stab{
-flex:1;padding:8px 5px;text-align:center;cursor:pointer;
-background:var(–card);border:1px solid var(–bdr);border-radius:8px;
-font-size:.72rem;font-weight:600;color:var(–muted);transition:all .15s;
-}
-.stab.on{background:var(–c-burger);border-color:var(–c-burger);color:#000}
+/* ═══════════════════════════ TIPPS BOX ════════════════════════ */
+.tip-box { background:var(–card); border:1.5px solid var(–bdr); border-radius:12px; overflow:hidden; margin-bottom:8px; }
+.tip-box-hd { padding:12px 14px; display:flex; align-items:center; gap:9px; background:var(–card2); cursor:pointer; }
+.tip-box-hd .tbi { font-size:1.2rem; }
+.tip-box-hd .tbt { font-family:‘Nunito’,sans-serif; font-weight:800; font-size:.78rem; flex:1; }
+.tip-box-chev { font-size:.68rem; color:var(–muted); transition:transform .22s; }
+.tip-box.open .tip-box-chev { transform:rotate(180deg); }
+.tip-box-bd { max-height:0; overflow:hidden; transition:max-height .35s ease; }
+.tip-box.open .tip-box-bd { max-height:800px; }
+.tip-item { display:flex; gap:9px; padding:7px 14px; font-size:.73rem; color:var(–muted); line-height:1.5; border-bottom:1px solid var(–bdr); }
+.tip-item:last-child { border-bottom:none; }
+.tip-num { font-family:‘Nunito’,sans-serif; font-weight:900; min-width:16px; font-size:.62rem; margin-top:1px; flex-shrink:0; }
 
-/* ═══ SEARCH ═══ */
-.search-wrap{padding:10px 14px 4px;max-width:720px;margin:0 auto}
-.search-input{
-width:100%;background:var(–card);border:1px solid var(–bdr);
-border-radius:8px;padding:9px 14px 9px 36px;
-font-family:‘Barlow’,sans-serif;font-size:.82rem;color:var(–text);
-outline:none;transition:border-color .15s;
-background-image:url(“data:image/svg+xml,%3Csvg xmlns=‘http://www.w3.org/2000/svg’ width=‘16’ height=‘16’ fill=’%2368677a’ viewBox=‘0 0 16 16’%3E%3Cpath d=‘M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242 1.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z’/%3E%3C/svg%3E”);
-background-repeat:no-repeat;background-position:10px center;
-}
-.search-input:focus{border-color:var(–c-blitz)}
+/* ═══════════════════════════ SECTION DIVIDER ══════════════════ */
+.sdiv { display:flex; align-items:center; gap:10px; padding:14px 14px 8px; max-width:720px; margin:0 auto; }
+.sdiv-t { font-family:‘Nunito’,sans-serif; font-weight:800; font-size:.58rem; letter-spacing:.18em; text-transform:uppercase; white-space:nowrap; }
+.sec-blitz  .sdiv-t { color:var(–blitz); }
+.sec-burger .sdiv-t { color:var(–burger); }
+.sec-crispy .sdiv-t { color:var(–crispy); }
+.sec-curry  .sdiv-t { color:var(–curry); }
+.sec-auf    .sdiv-t { color:var(–auf); }
+.sec-tipps  .sdiv-t { color:var(–tipps); }
+.sdiv-line { flex:1; height:1px; background:var(–bdr); }
 
-/* ═══ UTILITIES ═══ */
-.hidden{display:none!important}
-.empty{
-text-align:center;padding:40px 20px;color:var(–muted);
-font-size:.82rem;line-height:1.7;
-}
-.spacer{height:10px}
+/* ═══════════════════════════ RESULT COUNT ═════════════════════ */
+.rcount { font-size:.63rem; color:var(–muted); padding:3px 14px 6px; max-width:720px; margin:0 auto; }
+.rcount b { color:var(–text); }
 
-/* Crispy sub-tabs use fire color */
-#crispy-subtabs .stab.on { background:var(–c-crispy); border-color:var(–c-crispy); color:#fff; }
+/* ═══════════════════════════ EMPTY STATE ══════════════════════ */
+.empty { text-align:center; padding:40px 20px; color:var(–muted); font-size:.8rem; line-height:1.7; }
+
+/* ═══════════════════════════ HOME ═════════════════════════════ */
+.home-wrap {
+min-height: calc(100vh - 64px);
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+padding: 30px 18px;
+text-align: center;
+}
+.home-title {
+font-family: ‘Nunito’, sans-serif;
+font-weight: 900;
+font-size: clamp(2.5rem,11vw,5rem);
+line-height: .86;
+text-transform: uppercase;
+letter-spacing: -.02em;
+margin-bottom: 14px;
+}
+.home-title .l1 { color: var(–text); }
+.home-title .l2 { color: var(–blitz); }
+.home-title .l3 { color: var(–crispy); }
+.home-title .l4 { color: var(–curry); }
+.home-sub { font-size:.76rem; color:var(–muted); line-height:1.7; max-width:280px; margin: 0 auto 22px; }
+.home-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; width:100%; max-width:340px; }
+.home-card {
+background:var(–card);
+border:1.5px solid var(–bdr);
+border-radius:12px;
+padding:14px 10px;
+cursor:pointer;
+display:flex; flex-direction:column; align-items:center; gap:5px;
+transition: transform .13s, border-color .13s;
+}
+.home-card:active { transform:scale(.96); }
+.home-card .hc-ico { font-size:1.7rem; }
+.home-card .hc-t { font-family:‘Nunito’,sans-serif; font-weight:800; font-size:.72rem; color:var(–text); }
+.home-card .hc-s { font-size:.57rem; color:var(–muted); }
+.home-card.c-blitz  { border-color:rgba(255,214,10,.3); }
+.home-card.c-burger { border-color:rgba(255,159,10,.3); }
+.home-card.c-crispy { border-color:rgba(255,69,58,.3); }
+.home-card.c-curry  { border-color:rgba(255,107,53,.3); }
+.home-card.c-auf    { border-color:rgba(50,215,75,.3); grid-column:1/-1; flex-direction:row; justify-content:center; gap:12px; }
+.home-card.c-tipps  { border-color:rgba(100,210,255,.3); grid-column:1/-1; flex-direction:row; justify-content:center; gap:12px; }
+.random-btn {
+margin-top:16px;
+display:flex; align-items:center; gap:8px;
+background:var(–card); border:1.5px solid var(–bdr);
+border-radius:99px; padding:9px 20px;
+font-family:‘Nunito’,sans-serif; font-size:.76rem; font-weight:800; color:var(–soft);
+cursor:pointer; transition:all .13s;
+}
+.random-btn:active { background:var(–card2); transform:scale(.97); }
+
+/* panaden guide */
+.pan-card { background:var(–card); border:1.5px solid var(–bdr); border-radius:12px; overflow:hidden; cursor:pointer; margin-bottom:8px; }
+.pan-card-hd { padding:12px 14px; display:flex; align-items:center; gap:10px; }
+.pan-basis { background:rgba(100,210,255,.07); border:1px solid rgba(100,210,255,.2); border-radius:6px; padding:7px 10px; font-size:.69rem; color:var(–tipps); margin-bottom:10px; line-height:1.5; }
+
+/* ═══════════════════════════ UTILITIES ════════════════════════ */
+.hidden { display:none !important; }
+.mt8 { margin-top:8px; }
+.pb20 { padding-bottom:20px; }
 </style>
 
 </head>
 <body>
 
-<!-- ══ HOME ══ -->
+<!-- ══ HOME ══════════════════════════════════════════════════════ -->
 
-<div class="pg on" id="pg-home">
-<div class="splash">
-  <div class="splash-title">
-    THE<br><span class="y">ULTIMATE</span><br><span class="o">RECIPE</span><br><span class="g">BOOK</span>
+<div class="page active" id="page-home">
+  <div class="home-wrap">
+    <div class="home-title">
+      <div class="l1">THE</div>
+      <div class="l2">ULTIMATE</div>
+      <div class="l3">RECIPE</div>
+      <div class="l4">BOOK</div>
+    </div>
+    <p class="home-sub">7 Sektionen · 200+ Rezepte · LDL-freundlich · Air Fryer & TM7</p>
+    <div class="home-grid">
+      <div class="home-card c-blitz"  onclick="show('blitz')"><span class="hc-ico">⚡</span><span class="hc-t">Blitz Küche</span><span class="hc-s">40 Rez · ≤15 Min</span></div>
+      <div class="home-card c-burger" onclick="show('burger')"><span class="hc-ico">🍔</span><span class="hc-t">Burger Lab</span><span class="hc-s">30 Burger + Soßen</span></div>
+      <div class="home-card c-crispy" onclick="show('crispy')"><span class="hc-ico">🍗</span><span class="hc-t">Crispy Chicken</span><span class="hc-s">20+ Rez + Wings</span></div>
+      <div class="home-card c-curry"  onclick="show('curry')"><span class="hc-ico">🍛</span><span class="hc-t">Curry &amp; Eintopf</span><span class="hc-s">30+ Rezepte</span></div>
+      <div class="home-card c-auf"    onclick="show('auf')"><span class="hc-ico">🥪</span><span class="hc-t">Aufstriche</span><span class="hc-s">13 Rezepte · LDL-freundlich</span></div>
+      <div class="home-card c-tipps"  onclick="show('tipps')"><span class="hc-ico">💡</span><span class="hc-t">Küchen-Tipps</span><span class="hc-s">7 Kapitel</span></div>
+    </div>
+    <button class="random-btn" onclick="openRandom()">🎲 Zufälliges Rezept</button>
   </div>
-  <p class="splash-sub">6 Kapitel · 180+ Rezepte · LDL-freundlich · Air Fryer & TM7</p>
-  <div class="splash-grid">
-    <div class="splash-card c1" onclick="goTo('blitz')"><span class="ico">⚡</span><span class="lbl2">Blitz Küche</span><span class="cnt">40 Rez · ≤15 Min</span></div>
-    <div class="splash-card c2" onclick="goTo('burger')"><span class="ico">🍔</span><span class="lbl2">Burger Lab</span><span class="cnt">30 Burger + Soßen</span></div>
-    <div class="splash-card c3" onclick="goTo('crispy')"><span class="ico">🍗</span><span class="lbl2">Crispy Chicken</span><span class="cnt">20+ Rez + Dips</span></div>
-    <div class="splash-card c4" onclick="goTo('curry')"><span class="ico">🍛</span><span class="lbl2">Curry & Eintopf</span><span class="cnt">30+ Rezepte</span></div>
-    <div class="splash-card c5" onclick="goTo('aufstriche')" style="grid-column:1/-1;flex-direction:row;justify-content:center;gap:12px"><span class="ico">🥪</span><span class="lbl2">Gesunde Aufstriche</span><span class="cnt">13 Rezepte</span></div>
-    <div class="splash-card c6" onclick="goTo('tipps')" style="grid-column:1/-1;flex-direction:row;justify-content:center;gap:12px"><span class="ico">💡</span><span class="lbl2">Küchen-Tipps</span><span class="cnt">7 Kapitel</span></div>
-  </div>
-  <button class="random-btn" onclick="randomRecipe()">🎲 Zufälliges Rezept</button>
-</div>
 </div>
 
-<!-- ══ BLITZ ══ -->
+<!-- ══ BLITZ ══════════════════════════════════════════════════ -->
 
-<div class="pg blitz" id="pg-blitz">
-  <div class="hero blitz">
-    <div class="hero-stripe"><span>BLITZ KÜCHE</span><span>Alle ≤ 15 Min</span></div>
-    <div class="hero-body" style="--bg-emoji:'⚡'">
-      <h2><span>BLITZ</span><br>KÜCHE</h2>
-      <p>Alle Makros · Air Fryer & TM7 · LDL-freundlich<br>Asiatisch · Italienisch · Mexikanisch · Deutsch</p>
-      <div class="hero-pills"><span class="hp hot">⚡ ≤15 Min</span><span class="hp hot">🥩🌾🫒 Alle Makros</span><span class="hp">💚 LDL-ok</span></div>
+<div class="page sec-blitz" id="page-blitz">
+  <div class="hero">
+    <div class="hero-bar"><span>BLITZ KÜCHE</span><span>≤ 15 MIN</span></div>
+    <div class="hero-body">
+      <div class="hero-title"><em>BLITZ</em><br>KÜCHE</div>
+      <div class="hero-sub">Nudeln · Reis · Hähnchen · Gemüse · Alle Makros<br>Air Fryer · TM7 · Alltagstauglich</div>
+      <div class="hero-pills">
+        <span class="pill hl">⚡ ≤15 Min</span>
+        <span class="pill hl">💚 LDL-Filter</span>
+        <span class="pill">🌬️ AF + ⚙️ TM7</span>
+      </div>
     </div>
   </div>
   <div class="fwrap">
     <div class="frow"><div class="flbl">Kategorie</div><div class="fbar" id="bf-kat">
-      <button class="fb on" onclick="blitzFilter('kat','alle',this)">Alle</button>
-      <button class="fb" onclick="blitzFilter('kat','nudeln',this)">🍝 Nudeln</button>
-      <button class="fb" onclick="blitzFilter('kat','reis',this)">🍚 Reis</button>
-      <button class="fb" onclick="blitzFilter('kat','kartoffeln',this)">🥔 Kartoffeln</button>
-      <button class="fb" onclick="blitzFilter('kat','huhn',this)">🍗 Huhn</button>
-      <button class="fb" onclick="blitzFilter('kat','veggi',this)">🌱 Veggi</button>
-      <button class="fb" onclick="blitzFilter('kat','gemuese',this)">🥦 Gemüse</button>
-      <button class="fb" onclick="blitzFilter('kat','bohnen',this)">🫘 Bohnen</button>
-    </div></div>
-    <div class="frow"><div class="flbl">Küche</div><div class="fbar" id="bf-kueche">
-      <button class="fb on" onclick="blitzFilter('kueche','alle',this)">Alle</button>
-      <button class="fb" onclick="blitzFilter('kueche','asiatisch',this)">🌏 Asiatisch</button>
-      <button class="fb" onclick="blitzFilter('kueche','italienisch',this)">🇮🇹 Italienisch</button>
-      <button class="fb" onclick="blitzFilter('kueche','mexikanisch',this)">🇲🇽 Mexikanisch</button>
-      <button class="fb" onclick="blitzFilter('kueche','deutsch',this)">🇩🇪 Deutsch</button>
-      <button class="fb" onclick="blitzFilter('kueche','orientalisch',this)">🕌 Oriental</button>
+      <button class="fbtn on" onclick="bf('kat','alle',this)">Alle</button>
+      <button class="fbtn" onclick="bf('kat','nudeln',this)">🍝 Nudeln</button>
+      <button class="fbtn" onclick="bf('kat','reis',this)">🍚 Reis</button>
+      <button class="fbtn" onclick="bf('kat','kartoffeln',this)">🥔 Kartoffeln</button>
+      <button class="fbtn" onclick="bf('kat','huhn',this)">🍗 Huhn</button>
+      <button class="fbtn" onclick="bf('kat','veggi',this)">🌱 Veggi</button>
+      <button class="fbtn" onclick="bf('kat','gemuese',this)">🥦 Gemüse</button>
+      <button class="fbtn" onclick="bf('kat','bohnen',this)">🫘 Bohnen</button>
     </div></div>
     <div class="frow"><div class="flbl">Gerät</div><div class="fbar" id="bf-geraet">
-      <button class="fb on" onclick="blitzFilter('geraet','alle',this)">Alle</button>
-      <button class="fb" onclick="blitzFilter('geraet','af',this)">🌬️ Air Fryer</button>
-      <button class="fb" onclick="blitzFilter('geraet','tm',this)">⚙️ TM7</button>
-      <button class="fb" onclick="blitzFilter('geraet','both',this)">🔀 Beide</button>
+      <button class="fbtn on" onclick="bf('geraet','alle',this)">Alle</button>
+      <button class="fbtn" onclick="bf('geraet','af',this)">🌬️ Air Fryer</button>
+      <button class="fbtn" onclick="bf('geraet','tm',this)">⚙️ TM7</button>
+      <button class="fbtn" onclick="bf('geraet','both',this)">🔀 Beide</button>
     </div></div>
     <div class="frow"><div class="flbl">Gesundheit</div><div class="fbar" id="bf-ldl">
-      <button class="fb on" onclick="blitzFilter('ldl','alle',this)">Alle</button>
-      <button class="fb" onclick="blitzFilter('ldl','ja',this)">💚 LDL-freundlich</button>
+      <button class="fbtn on" onclick="bf('ldl','alle',this)">Alle</button>
+      <button class="fbtn" onclick="bf('ldl','ja',this)">💚 LDL-freundlich</button>
     </div></div>
   </div>
-  <div class="result-count" id="blitz-count"></div>
+  <div class="rcount" id="blitz-count"></div>
   <div class="grid" id="blitz-grid"></div>
-  <div class="empty hidden" id="blitz-empty">⚡ Keine Rezepte für diese Kombination.</div>
-  <div class="sdiv blitz"><span class="sdiv-t">TIPPS & TRICKS</span><div class="sdiv-l"></div></div>
+  <div class="empty hidden" id="blitz-empty">Keine Rezepte für diese Auswahl.</div>
+  <div class="sdiv sec-blitz"><span class="sdiv-t">TIPPS & TRICKS</span><div class="sdiv-line"></div></div>
   <div style="padding:0 14px 20px;max-width:720px;margin:0 auto" id="blitz-tipps"></div>
 </div>
 
-<!-- ══ BURGER ══ -->
+<!-- ══ BURGER ══════════════════════════════════════════════════ -->
 
-<div class="pg burger" id="pg-burger">
-  <div class="hero burger">
-    <div class="hero-stripe"><span>BURGER LAB</span><span>Vol.2 · 30 Burger</span></div>
+<div class="page sec-burger" id="page-burger">
+  <div class="hero">
+    <div class="hero-bar"><span>BURGER LAB</span><span>VOL.2 · 30 BURGER</span></div>
     <div class="hero-body">
-      <h2>THE<br><span>BURGER</span><br>LAB</h2>
-      <p>Rind · Huhn · Tatar · Veggie · Paniert<br>Klassisch · Gourmet · International · Healthy</p>
-      <div class="hero-pills"><span class="hp hot">30 Burger</span><span class="hp hot">7 Paniert</span><span class="hp hot">20 Soßen</span><span class="hp">⭐ Gourmet</span></div>
+      <div class="hero-title">THE<br><em>BURGER</em><br>LAB</div>
+      <div class="hero-sub">Rind · Huhn · Tatar · Veggie · Paniert<br>Klassisch · Gourmet · International · Healthy</div>
+      <div class="hero-pills">
+        <span class="pill hl">30 Burger</span>
+        <span class="pill hl">7 Paniert</span>
+        <span class="pill hl">20 Soßen</span>
+        <span class="pill">💚 LDL-Filter</span>
+      </div>
     </div>
   </div>
   <div class="subtabs">
-    <div class="stab on" id="st-burger" onclick="burgerTab('burger',this)">🍔 Burger</div>
-    <div class="stab" id="st-paniert" onclick="burgerTab('paniert',this)">🍗 Paniert</div>
-    <div class="stab" id="st-sossen" onclick="burgerTab('sossen',this)">🫙 Soßen</div>
+    <div class="stab on" id="bst-burger"  onclick="bTab('burger',this)">🍔 Burger</div>
+    <div class="stab"    id="bst-paniert" onclick="bTab('paniert',this)">🍗 Paniert</div>
+    <div class="stab"    id="bst-sossen"  onclick="bTab('sossen',this)">🫙 Soßen</div>
   </div>
-
-  <!-- burger filters (shown only for burger tab) -->
-
-  <div id="burger-filters" class="fwrap">
-    <div class="frow"><div class="flbl">Protein</div><div class="fbar" id="bf-prot">
-      <button class="fb on" onclick="burgerFilter('prot','alle',this)">Alle</button>
-      <button class="fb" onclick="burgerFilter('prot','rind',this)">🥩 Rind</button>
-      <button class="fb" onclick="burgerFilter('prot','huhn',this)">🍗 Huhn</button>
-      <button class="fb" onclick="burgerFilter('prot','tatar',this)">🔪 Tatar</button>
-      <button class="fb" onclick="burgerFilter('prot','veggie',this)">🌱 Veggie</button>
-    </div></div>
-    <div class="frow"><div class="flbl">Style</div><div class="fbar" id="bf-style">
-      <button class="fb on" onclick="burgerFilter('style','alle',this)">Alle</button>
-      <button class="fb" onclick="burgerFilter('style','klassisch',this)">🍔 Klassisch</button>
-      <button class="fb" onclick="burgerFilter('style','gourmet',this)">⭐ Gourmet</button>
-      <button class="fb" onclick="burgerFilter('style','international',this)">🌍 International</button>
-      <button class="fb" onclick="burgerFilter('style','healthy',this)">💚 Healthy</button>
-    </div></div>
-    <div class="frow"><div class="flbl">Gesundheit</div><div class="fbar" id="bf-bldl">
-      <button class="fb on" onclick="burgerFilter('ldl','alle',this)">Alle</button>
-      <button class="fb" onclick="burgerFilter('ldl','ja',this)">💚 LDL-freundlich</button>
-    </div></div>
+  <!-- Burger filters -->
+  <div id="burger-filters">
+    <div class="fwrap">
+      <div class="frow"><div class="flbl">Protein</div><div class="fbar" id="bbf-prot">
+        <button class="fbtn on" onclick="bbf('prot','alle',this)">Alle</button>
+        <button class="fbtn" onclick="bbf('prot','rind',this)">🥩 Rind</button>
+        <button class="fbtn" onclick="bbf('prot','huhn',this)">🍗 Huhn</button>
+        <button class="fbtn" onclick="bbf('prot','tatar',this)">🔪 Tatar</button>
+        <button class="fbtn" onclick="bbf('prot','veggie',this)">🌱 Veggie</button>
+      </div></div>
+      <div class="frow"><div class="flbl">Style</div><div class="fbar" id="bbf-style">
+        <button class="fbtn on" onclick="bbf('style','alle',this)">Alle</button>
+        <button class="fbtn" onclick="bbf('style','klassisch',this)">🍔 Klassisch</button>
+        <button class="fbtn" onclick="bbf('style','gourmet',this)">⭐ Gourmet</button>
+        <button class="fbtn" onclick="bbf('style','international',this)">🌍 International</button>
+        <button class="fbtn" onclick="bbf('style','healthy',this)">💚 Healthy</button>
+      </div></div>
+    </div>
+    <div class="rcount" id="burger-count"></div>
   </div>
-  <div class="result-count hidden" id="burger-count"></div>
-
   <div class="grid" id="burger-grid"></div>
-  <div class="grid" id="paniert-grid"></div>
-  <div class="empty hidden" id="burger-empty">🍔 Keine Burger für diese Filter.</div>
-
+  <div class="grid" id="paniert-grid" style="display:none"></div>
+  <div class="empty hidden" id="burger-empty">Keine Burger für diese Filter.</div>
   <div id="sossen-section" style="display:none;padding-bottom:20px">
-    <div class="sdiv burger"><span class="sdiv-t">SOBEN & DIPS</span><div class="sdiv-l"></div></div>
-    <div id="sossen-wrap"></div>
+    <div class="sdiv sec-burger mt8"><span class="sdiv-t">SOBEN & DIPS</span><div class="sdiv-line"></div></div>
+    <div id="burger-sossen-wrap"></div>
   </div>
 </div>
 
-<!-- ══ CRISPY ══ -->
+<!-- ══ CRISPY ══════════════════════════════════════════════════ -->
 
-<div class="pg crispy" id="pg-crispy">
-  <div class="hero crispy">
-    <div class="hero-stripe"><span>HOT &amp; CRISPY</span><span>Air Fryer · Backofen · TM7</span></div>
+<div class="page sec-crispy" id="page-crispy">
+  <div class="hero">
+    <div class="hero-bar"><span>HOT & CRISPY</span><span>AF · BACKOFEN · TM7</span></div>
     <div class="hero-body">
-      <h2>CRISPY<br><span>CHICKEN</span></h2>
-      <p>Burger · Wraps · Fingers · Wings · Dips · Healthy<br>30+ Rezepte · Panaden-Guide · Soßen</p>
-      <div class="hero-pills"><span class="hp hot">🌬️ Air Fryer</span><span class="hp hot">🔥 Backofen</span><span class="hp hot">🍖 Wings</span><span class="hp">💚 LDL</span></div>
+      <div class="hero-title">CRISPY<br><em>CHICKEN</em></div>
+      <div class="hero-sub">Burger · Wraps · Fingers · Wings · Dips<br>20+ Rezepte · Panaden-Guide · Soßen</div>
+      <div class="hero-pills">
+        <span class="pill hl">🌬️ Air Fryer</span>
+        <span class="pill hl">🍖 Wings</span>
+        <span class="pill">💚 LDL-Filter</span>
+      </div>
     </div>
   </div>
-
-  <!-- SUB-TABS -->
-
-  <div class="subtabs" id="crispy-subtabs">
-    <div class="stab on" onclick="crispyTab('rezepte',this)">🍗 Rezepte</div>
-    <div class="stab" onclick="crispyTab('sossen',this)">🫙 Soßen</div>
-    <div class="stab" onclick="crispyTab('panaden',this)">🧂 Panaden</div>
+  <div class="subtabs">
+    <div class="stab on" onclick="cTab('rezepte',this)">🍗 Rezepte</div>
+    <div class="stab"    onclick="cTab('sossen',this)">🫙 Soßen</div>
+    <div class="stab"    onclick="cTab('panaden',this)">🧂 Panaden</div>
   </div>
-
-  <!-- REZEPTE TAB -->
-
+  <!-- Rezepte tab -->
   <div id="ct-rezepte">
     <div class="fwrap">
       <div class="frow"><div class="flbl">Kategorie</div><div class="fbar" id="cf-kat">
-        <button class="fb on" onclick="crispyFilter('kat','alle',this)">Alle</button>
-        <button class="fb" onclick="crispyFilter('kat','burger',this)">🍔 Burger</button>
-        <button class="fb" onclick="crispyFilter('kat','wrap',this)">🌯 Wrap</button>
-        <button class="fb" onclick="crispyFilter('kat','fingers',this)">🍗 Fingers</button>
-        <button class="fb" onclick="crispyFilter('kat','dip',this)">🥔 Dips</button>
-        <button class="fb" onclick="crispyFilter('kat','healthy',this)">💚 Healthy</button>
-        <button class="fb" onclick="crispyFilter('kat','wings',this)">🍖 Wings</button>
+        <button class="fbtn on" onclick="cf('kat','alle',this)">Alle</button>
+        <button class="fbtn" onclick="cf('kat','burger',this)">🍔 Burger</button>
+        <button class="fbtn" onclick="cf('kat','wrap',this)">🌯 Wrap</button>
+        <button class="fbtn" onclick="cf('kat','fingers',this)">🍗 Fingers</button>
+        <button class="fbtn" onclick="cf('kat','dip',this)">🥔 Dips</button>
+        <button class="fbtn" onclick="cf('kat','healthy',this)">💚 Healthy</button>
+        <button class="fbtn" onclick="cf('kat','wings',this)">🍖 Wings</button>
       </div></div>
       <div class="frow"><div class="flbl">Gerät</div><div class="fbar" id="cf-geraet">
-        <button class="fb on" onclick="crispyFilter('geraet','alle',this)">Alle</button>
-        <button class="fb" onclick="crispyFilter('geraet','Air Fryer',this)">🌬️ Air Fryer</button>
-        <button class="fb" onclick="crispyFilter('geraet','Backofen',this)">🔥 Backofen</button>
-        <button class="fb" onclick="crispyFilter('geraet','TM7',this)">⚙️ TM7</button>
-      </div></div>
-      <div class="frow"><div class="flbl">Gesundheit</div><div class="fbar" id="cf-ldl">
-        <button class="fb on" onclick="crispyFilter('ldl','alle',this)">Alle</button>
-        <button class="fb" onclick="crispyFilter('ldl','ja',this)">💚 LDL-freundlich</button>
+        <button class="fbtn on" onclick="cf('geraet','alle',this)">Alle</button>
+        <button class="fbtn" onclick="cf('geraet','Air Fryer',this)">🌬️ Air Fryer</button>
+        <button class="fbtn" onclick="cf('geraet','Backofen',this)">🔥 Backofen</button>
+        <button class="fbtn" onclick="cf('geraet','TM7',this)">⚙️ TM7</button>
       </div></div>
     </div>
-    <div class="result-count" id="crispy-count"></div>
+    <div class="rcount" id="crispy-count"></div>
     <div class="grid" id="crispy-grid"></div>
-    <div class="empty hidden" id="crispy-empty">🍗 Keine Rezepte für diese Kombination.</div>
+    <div class="empty hidden" id="crispy-empty">Keine Rezepte für diese Auswahl.</div>
   </div>
-
-  <!-- SOBEN TAB -->
-
+  <!-- Soßen tab -->
   <div id="ct-sossen" style="display:none;padding-bottom:20px">
     <div id="crispy-sossen-wrap"></div>
   </div>
-
-  <!-- PANADEN TAB -->
-
+  <!-- Panaden tab -->
   <div id="ct-panaden" style="display:none;padding:0 14px 20px;max-width:720px;margin:0 auto">
     <div id="panaden-wrap"></div>
   </div>
+</div>
 
-<!-- ══ CURRY ══ -->
+<!-- ══ CURRY ══════════════════════════════════════════════════ -->
 
-<div class="pg curry" id="pg-curry">
-  <div class="hero curry">
-    <div class="hero-stripe"><span>GEWÜRZE · AROMEN · WÄRME</span><span>30+ Rezepte</span></div>
+<div class="page sec-curry" id="page-curry">
+  <div class="hero">
+    <div class="hero-bar"><span>GEWÜRZE · AROMEN · WÄRME</span><span>30+ REZEPTE</span></div>
     <div class="hero-body">
-      <h2>Curry &<br><em>Eintopf</em></h2>
-      <p>Indisch · Thai · Orientalisch · Klassisch<br>Scharf & Mild · TM7 · Portionsskalierung</p>
-      <div class="hero-pills"><span class="hp hot">🍛 Curry</span><span class="hp hot">🥘 Eintopf</span><span class="hp hot">🍝 One Pot</span><span class="hp">⚙️ TM7</span></div>
+      <div class="hero-title">CURRY &amp;<br><em>EINTOPF</em></div>
+      <div class="hero-sub">Indisch · Thai · Orientalisch · Klassisch<br>TM7 · Portionsskalierung · LDL-freundlich</div>
+      <div class="hero-pills">
+        <span class="pill hl">🍛 Curry</span>
+        <span class="pill hl">🥘 Eintopf</span>
+        <span class="pill">💚 LDL-Filter</span>
+      </div>
     </div>
   </div>
   <div class="fwrap">
     <div class="frow"><div class="flbl">Kategorie</div><div class="fbar" id="kf-kat">
-      <button class="fb on" onclick="curryFilter('kat','alle',this)">Alle</button>
-      <button class="fb" onclick="curryFilter('kat','curry',this)">🍛 Curry</button>
-      <button class="fb" onclick="curryFilter('kat','eintopf',this)">🥘 Eintopf</button>
-      <button class="fb" onclick="curryFilter('kat','onepot',this)">🍝 One Pot</button>
-      <button class="fb" onclick="curryFilter('kat','healthy',this)">💚 LDL Healthy</button>
+      <button class="fbtn on" onclick="kf('kat','alle',this)">Alle</button>
+      <button class="fbtn" onclick="kf('kat','curry',this)">🍛 Curry</button>
+      <button class="fbtn" onclick="kf('kat','eintopf',this)">🥘 Eintopf</button>
+      <button class="fbtn" onclick="kf('kat','onepot',this)">🍝 One Pot</button>
+      <button class="fbtn" onclick="kf('kat','healthy',this)">💚 LDL Healthy</button>
     </div></div>
     <div class="frow"><div class="flbl">Protein</div><div class="fbar" id="kf-prot">
-      <button class="fb on" onclick="curryFilter('prot','alle',this)">Alle</button>
-      <button class="fb" onclick="curryFilter('prot','huhn',this)">🍗 Huhn</button>
-      <button class="fb" onclick="curryFilter('prot','vegan',this)">🌱 Vegan</button>
-      <button class="fb" onclick="curryFilter('prot','vegetarisch',this)">🥚 Vegetarisch</button>
+      <button class="fbtn on" onclick="kf('prot','alle',this)">Alle</button>
+      <button class="fbtn" onclick="kf('prot','huhn',this)">🍗 Huhn</button>
+      <button class="fbtn" onclick="kf('prot','vegan',this)">🌱 Vegan</button>
+      <button class="fbtn" onclick="kf('prot','vegetarisch',this)">🥚 Vegetarisch</button>
     </div></div>
     <div class="frow"><div class="flbl">Schärfe</div><div class="fbar" id="kf-heat">
-      <button class="fb on" onclick="curryFilter('heat','alle',this)">Alle</button>
-      <button class="fb" onclick="curryFilter('heat','mild',this)">🟢 Mild</button>
-      <button class="fb" onclick="curryFilter('heat','mittel',this)">🟡 Mittel</button>
-      <button class="fb" onclick="curryFilter('heat','scharf',this)">🔴 Scharf</button>
-    </div></div>
-    <div class="frow"><div class="flbl">Gesundheit</div><div class="fbar" id="kf-ldl">
-      <button class="fb on" onclick="curryFilter('ldl','alle',this)">Alle</button>
-      <button class="fb" onclick="curryFilter('ldl','ja',this)">💚 LDL-freundlich</button>
+      <button class="fbtn on" onclick="kf('heat','alle',this)">Alle</button>
+      <button class="fbtn" onclick="kf('heat','mild',this)">🟢 Mild</button>
+      <button class="fbtn" onclick="kf('heat','mittel',this)">🟡 Mittel</button>
+      <button class="fbtn" onclick="kf('heat','scharf',this)">🔴 Scharf</button>
     </div></div>
   </div>
-  <div class="result-count" id="curry-count"></div>
+  <div class="rcount" id="curry-count"></div>
   <div class="grid" id="curry-grid"></div>
-  <div class="empty hidden" id="curry-empty">🍛 Keine Rezepte für diese Kombination.</div>
+  <div class="empty hidden" id="curry-empty">Keine Rezepte für diese Auswahl.</div>
 </div>
 
-<!-- ══ AUFSTRICHE ══ -->
+<!-- ══ AUFSTRICHE ══════════════════════════════════════════════ -->
 
-<div class="pg aufstriche" id="pg-aufstriche">
-  <div class="hero aufstriche">
-    <div class="hero-stripe"><span>GESUNDE AUFSTRICHE</span><span>13 Rezepte</span></div>
+<div class="page sec-auf" id="page-auf">
+  <div class="hero">
+    <div class="hero-bar"><span>GESUNDE AUFSTRICHE</span><span>13 REZEPTE</span></div>
     <div class="hero-body">
-      <h2>BROT<br><span>AUFSTRICHE</span></h2>
-      <p>Hummus · Paprika · Knoblauch · Avocado<br>LDL-freundlich · Vegan · TM7</p>
-      <div class="hero-pills"><span class="hp hot">💚 LDL-freundlich</span><span class="hp hot">🌱 Vegan</span><span class="hp">⏱ Unter 30 Min</span></div>
+      <div class="hero-title">BROT<br><em>AUFSTRICHE</em></div>
+      <div class="hero-sub">Hummus · Paprika · Knoblauch · Avocado<br>LDL-freundlich · Vegan · TM7</div>
+      <div class="hero-pills">
+        <span class="pill hl">💚 LDL-freundlich</span>
+        <span class="pill hl">🌱 Vegan</span>
+      </div>
     </div>
   </div>
   <div class="fwrap">
     <div class="frow"><div class="flbl">Filter</div><div class="fbar" id="af-tag">
-      <button class="fb on" onclick="aufFilter('alle',this)">Alle</button>
-      <button class="fb" onclick="aufFilter('vegan',this)">🌱 Vegan</button>
-      <button class="fb" onclick="aufFilter('protein',this)">💪 Protein</button>
-      <button class="fb" onclick="aufFilter('herz',this)">❤️ Herzgesund</button>
-      <button class="fb" onclick="aufFilter('quick',this)">⚡ Schnell</button>
+      <button class="fbtn on" onclick="af('alle',this)">Alle</button>
+      <button class="fbtn" onclick="af('vegan',this)">🌱 Vegan</button>
+      <button class="fbtn" onclick="af('protein',this)">💪 Protein</button>
+      <button class="fbtn" onclick="af('herz',this)">❤️ Herzgesund</button>
+      <button class="fbtn" onclick="af('quick',this)">⚡ Schnell</button>
     </div></div>
   </div>
   <div class="grid" id="auf-grid"></div>
 </div>
 
-<!-- ══ TIPPS ══ -->
+<!-- ══ TIPPS ══════════════════════════════════════════════════ -->
 
-<div class="pg tipps" id="pg-tipps">
-  <div class="hero tipps">
-    <div class="hero-stripe" style="background:var(--c-tipps);color:#000"><span>KÜCHEN-BIBLIOTHEK</span><span>7 Kapitel</span></div>
+<div class="page sec-tipps" id="page-tipps">
+  <div class="hero">
+    <div class="hero-bar" style="background:var(--tipps);color:#000"><span>KÜCHEN-BIBLIOTHEK</span><span>7 KAPITEL</span></div>
     <div class="hero-body">
-      <h2>KÜCHEN<br><span>TIPPS</span></h2>
-      <p>Marinaden · Temperaturen · AF & TM7<br>Würzen · Meal Prep · Einkaufen</p>
-      <div class="hero-pills"><span class="hp" style="border-color:var(--c-tipps);color:var(--c-tipps)">💡 7 Kapitel</span></div>
+      <div class="hero-title">KÜCHEN<br><em>TIPPS</em></div>
+      <div class="hero-sub">Techniken · Temperaturen · AF & TM7<br>Würzen · Marinieren · Meal Prep</div>
+      <div class="hero-pills">
+        <span class="pill hl">💡 7 Kapitel</span>
+      </div>
     </div>
   </div>
   <div style="padding:14px 14px 30px;max-width:720px;margin:0 auto" id="tipps-wrap"></div>
 </div>
 
-<!-- ══ BOTTOM NAV ══ -->
+<!-- ══ BOTTOM NAV ═══════════════════════════════════════════════ -->
 
-<nav class="nav">
-  <button class="nt on" data-s="home" onclick="goTo('home',this)"><span class="nt-i">🏠</span><span class="nt-l">Home</span></button>
-  <button class="nt" data-s="blitz" onclick="goTo('blitz',this)"><span class="nt-i">⚡</span><span class="nt-l">Blitz</span><span class="nbadge">40</span></button>
-  <button class="nt" data-s="burger" onclick="goTo('burger',this)"><span class="nt-i">🍔</span><span class="nt-l">Burger</span><span class="nbadge">30</span></button>
-  <button class="nt" data-s="crispy" onclick="goTo('crispy',this)"><span class="nt-i">🍗</span><span class="nt-l">Crispy</span><span class="nbadge">20</span></button>
-  <button class="nt" data-s="curry" onclick="goTo('curry',this)"><span class="nt-i">🍛</span><span class="nt-l">Curry</span><span class="nbadge">30</span></button>
-  <button class="nt" data-s="aufstriche" onclick="goTo('aufstriche',this)"><span class="nt-i">🥪</span><span class="nt-l">Aufstriche</span></button>
-  <button class="nt" data-s="tipps" onclick="goTo('tipps',this)"><span class="nt-i">💡</span><span class="nt-l">Tipps</span></button>
-</nav>
+<div id="nav">
+  <button class="nav-btn on" data-p="home"   onclick="show('home',this)"><span class="nav-ico">🏠</span><span class="nav-lbl">Home</span></button>
+  <button class="nav-btn"    data-p="blitz"  onclick="show('blitz',this)"><span class="nav-ico">⚡</span><span class="nav-lbl">Blitz</span><span class="nav-badge">40</span></button>
+  <button class="nav-btn"    data-p="burger" onclick="show('burger',this)"><span class="nav-ico">🍔</span><span class="nav-lbl">Burger</span><span class="nav-badge">30</span></button>
+  <button class="nav-btn"    data-p="crispy" onclick="show('crispy',this)"><span class="nav-ico">🍗</span><span class="nav-lbl">Crispy</span><span class="nav-badge">20</span></button>
+  <button class="nav-btn"    data-p="curry"  onclick="show('curry',this)"><span class="nav-ico">🍛</span><span class="nav-lbl">Curry</span><span class="nav-badge">30</span></button>
+  <button class="nav-btn"    data-p="auf"    onclick="show('auf',this)"><span class="nav-ico">🥪</span><span class="nav-lbl">Aufstriche</span></button>
+  <button class="nav-btn"    data-p="tipps"  onclick="show('tipps',this)"><span class="nav-ico">💡</span><span class="nav-lbl">Tipps</span></button>
+</div>
 
 <script>
-const D_WINGS = [
-{n:1, ico:'🍯', title:'Honey Garlic Sticky Wings',
- sub:'Honig · Knoblauch · Sojasoße · glasiert',
- heat:'mild', zeit:'25 Min', geraet:['Air Fryer','Backofen'],
- marinade:[['Sojasoße','3 EL'],['Honig','3 EL'],['Knoblauch (gerieben)','4 Zehen'],['Olivenöl','1 EL'],['Ingwer','1 TL'],['Schwarzer Pfeffer','½ TL']],
- marinade_zeit:'30 Min',
- zutaten:[['Chicken Wings','1 kg'],['Sesam','1 EL'],['Frühlingszwiebeln','3'],['Rapsöl-Spray','etwas']],
- schritte:['Wings in Marinade 30 Min – besser über Nacht.',
-   '<strong>Air Fryer:</strong> 200°C, 22 Min. Nach 12 Min wenden.',
-   '<strong>Glaze:</strong> Restmarinade in Topf 3 Min einkochen bis sie dickflüssig ist.',
-   'Fertige Wings in Glaze schwenken. Sesam + Frühlingszwiebeln drüber.'],
- tipp:'Wings trocken tupfen vor dem Fryer – dann werden sie knuspriger. Glaze NACH dem Garen, nie vorher.',
- ldl:true},
-{n:2, ico:'🌶️', title:'Nashville Hot Wings',
- sub:'Buttermilch · Cayenne · Hot Oil · Iconic',
- heat:'sehr scharf', zeit:'30 Min', geraet:['Air Fryer','Backofen'],
- marinade:[['Buttermilch','300 ml'],["Franks Hot Sauce",'3 EL'],['Salz','1 TL'],['Knoblauchpulver','1 TL'],['Cayenne','1 TL']],
- marinade_zeit:'2h+',
- zutaten:[['Chicken Wings','1 kg'],['Mehl','80 g'],['Paprikapulver','1 TL'],['Rapsöl','4 EL'],['Cayenne','2 TL'],['Brauner Zucker','1 TL'],['Smoked Paprika','1 TL'],['Salz','½ TL']],
- schritte:['Mind. 2h in Buttermilch-Marinade. Besser über Nacht.',
-   'Mehl + Paprika mischen. Wings abtropfen, in Mehl wenden.',
-   '<strong>Air Fryer:</strong> 200°C, 22 Min. Nach 12 Min wenden.',
-   '<strong>Hot Oil:</strong> Rapsöl auf 170°C. Gewürze rein, sofort rühren. Über Wings giessen.'],
- tipp:'Hot Oil NACH dem Garen – nie vorher. Die Hitze des Öls aktiviert den Cayenne. Für weniger Schärfe: 1 TL statt 2.'},
-{n:3, ico:'🇰🇷', title:'Korean Gochujang Wings',
- sub:'Gochujang · Honig · Sesamöl · Double Crispy',
- heat:'mittel-scharf', zeit:'28 Min', geraet:['Air Fryer','Backofen'],
- marinade:[['Sojasoße','2 EL'],['Sesamöl','1 TL'],['Knoblauch','3 Zehen'],['Ingwer','1 TL'],['Reisessig','1 EL']],
- marinade_zeit:'1h',
- zutaten:[['Chicken Wings','1 kg'],['Gochujang','3 EL'],['Honig','2 EL'],['Sojasoße','1 EL'],['Butter','1 EL'],['Sesam','2 TL'],['Frühlingszwiebeln','4']],
- schritte:['1h marinieren. Trocken tupfen.',
-   '<strong>Air Fryer Doppelrunde:</strong> 180°C, 12 Min – kurz pause – 200°C, 10 Min. Ultra-Crispy!',
-   '<strong>Glaze:</strong> Gochujang + Honig + Sojasoße + Butter in Pfanne 2 Min warm rühren.',
-   'Wings in warmer Glaze schwenken. Sesam + Frühlingszwiebeln drüber.'],
- tipp:'Die Doppelrunden-Technik ist das Korea-Geheimnis: erst bei 180°C durchgaren, dann bei 200°C die Kruste knusprig blasen.'},
-{n:4, ico:'🧄', title:'Parmesan Garlic Wings',
- sub:'Parmesan · Knoblauchbutter · Kräuter · Gourmet',
- heat:'mild', zeit:'25 Min', geraet:['Air Fryer','Backofen'],
- marinade:[['Olivenöl','3 EL'],['Knoblauchpulver','1 TL'],['Salz','1 TL'],['Schwarzer Pfeffer','½ TL'],['Oregano','1 TL']],
- marinade_zeit:'30 Min',
- zutaten:[['Chicken Wings','1 kg'],['Butter','40 g'],['Knoblauch (gerieben)','5 Zehen'],['Parmesan (fein gerieben)','60 g'],['Petersilie','3 EL'],['Zitronensaft','1 EL']],
- schritte:['Wings mit Olivenöl-Marinade einreiben. 30 Min ziehen.',
-   '<strong>Air Fryer:</strong> 200°C, 20–22 Min. Nach 12 Min wenden.',
-   '<strong>Butter-Knoblauch:</strong> Butter schmelzen, Knoblauch 1 Min sanft anschwitzen (NICHT braten). Zitrone rein.',
-   'Wings in Knoblauchbutter wenden. Parmesan + Petersilie drüber.'],
- tipp:'Knoblauch in der Butter NIE braun werden lassen – nur goldgelb. Parmesan direkt auf die heissen Wings streuen damit er leicht schmilzt.',
- ldl:true},
-{n:5, ico:'🍋', title:'Lemon Pepper Wings',
- sub:'Zitrone · Schwarzer Pfeffer · Butter · Klassiker',
- heat:'mild', zeit:'22 Min', geraet:['Air Fryer','Backofen'],
- marinade:[['Olivenöl','2 EL'],['Zitrone (Saft + Abrieb)','2'],['Schwarzer Pfeffer (grob)','2 TL'],['Salz','1 TL'],['Knoblauchpulver','1 TL']],
- marinade_zeit:'30 Min',
- zutaten:[['Chicken Wings','1 kg'],['Butter','30 g'],['Zitronenabrieb','1 Zitrone'],['Schwarzer Pfeffer (grob)','1 TL'],['Petersilie','2 EL']],
- schritte:['Wings mit Marinade einreiben. 30 Min ziehen lassen.',
-   '<strong>Air Fryer:</strong> 200°C, 20–22 Min. Nach 11 Min wenden.',
-   'Butter schmelzen. Zitronenabrieb + groben Pfeffer einrühren.',
-   'Wings in Lemon-Pepper-Butter wenden. Petersilie drüber.'],
- tipp:'Zitronenabrieb statt nur Saft – der Abrieb enthält die ätherischen Öle die das intensive Aroma geben. Frisch gerieben, nicht getrocknet.',
- ldl:true},
-{n:6, ico:'🫙', title:'Teriyaki Wings mit Mirin',
- sub:'Japanische Glasur · Mirin · Sake · Sesam',
- heat:'mild', zeit:'28 Min', geraet:['Air Fryer','Backofen'],
- marinade:[['Sojasoße','4 EL'],['Mirin','3 EL'],['Sake oder trockener Sherry','2 EL'],['Brauner Zucker','1 EL'],['Ingwer (gerieben)','1 TL'],['Knoblauch','2 Zehen']],
- marinade_zeit:'2h',
- zutaten:[['Chicken Wings','1 kg'],['Sesam','2 TL'],['Frühlingszwiebeln','4'],['Sesamöl','1 TL']],
- schritte:['2h marinieren (Marinade aufbewahren).',
-   '<strong>Air Fryer:</strong> 200°C, 22 Min. Nach 12 Min wenden.',
-   '<strong>Teriyaki-Glaze:</strong> Restmarinade + 1 TL Stärke in Topf, 3 Min einkochen bis sirupartig.',
-   'Wings glasieren. Sesamöl + Sesam + Frühlingszwiebeln drüber.'],
- tipp:'Mirin ist Pflicht – kein Reisessig als Ersatz. Sake oder Sherry sind akzeptabel. Die Marinade IMMER aufkochen bevor als Sauce verwenden.',
- ldl:true},
-{n:7, ico:'🔥', title:'Chipotle Smoked Wings',
- sub:'Chipotle in Adobo · Rauchig · BBQ-Style · Deep',
- heat:'mittel-scharf', zeit:'28 Min', geraet:['Air Fryer','Backofen'],
- marinade:[['Chipotle in Adobo (püriert)','2 EL'],['Olivenöl','2 EL'],['Brauner Zucker','1 EL'],['Knoblauch','3 Zehen'],['Kreuzkümmel','1 TL'],['Limettensaft','2 EL'],['Salz','1 TL']],
- marinade_zeit:'2h+',
- zutaten:[['Chicken Wings','1 kg'],['Limette','1'],['Koriander','3 EL'],['Saure Sahne oder Joghurt','zum Dippen']],
- schritte:['Mind. 2h marinieren – Rauchgeschmack braucht Zeit.',
-   '<strong>Air Fryer:</strong> 190°C, 24 Min. Nach 12 Min wenden.',
-   'Mit Limettensaft beträufeln. Koriander drüber.',
-   'Mit Joghurt-Dip servieren.'],
- tipp:'Chipotle in Adobo ist der Schlüssel – gibt echten Rauchgeschmack ohne Räuchern. Im mexikanischen Supermarkt oder online.'},
-{n:8, ico:'🫐', title:'Buffalo Blue Cheese Wings',
- sub:'Franks Hot · Butter · Blue Cheese Dip · Sellerie',
- heat:'scharf', zeit:'25 Min', geraet:['Air Fryer','Backofen'],
- marinade:[['Buttermilch','250 ml'],["Franks Hot Sauce",'2 EL'],['Salz','1 TL'],['Knoblauchpulver','1 TL']],
- marinade_zeit:'1h',
- zutaten:[['Chicken Wings','1 kg'],["Franks Hot Sauce",'100 ml'],['Butter','50 g'],['Frischkäse','80 g'],['Saure Sahne','40 g'],['Blauschimmelkäse','40 g'],['Staudensellerie','4 Stangen']],
- schritte:['1h in Buttermilch marinieren.',
-   '<strong>Air Fryer:</strong> 200°C, 22 Min. Nach 12 Min wenden.',
-   '<strong>Buffalo Sauce:</strong> Butter schmelzen + Hot Sauce einrühren.',
-   '<strong>Blue Cheese Dip:</strong> Frischkäse + Saure Sahne glatt + Käse stückig. Wings in Sauce, Sellerie + Dip dazu.'],
- tipp:'Sellerie-Sticks sind kein Gimmick – die kühle Frische balanciert die fettige Schärfe perfekt. Der Temperaturkontrast ist das Erlebnis.'},
-{n:9, ico:'🥥', title:'Coconut Curry Wings',
- sub:'Kokosmilch · Currypaste · Zitronengras · Thai',
- heat:'mittel', zeit:'30 Min', geraet:['Air Fryer','Backofen'],
- marinade:[['Kokosmilch','150 ml'],['Rote Currypaste','2 EL'],['Fischsoße oder Sojasoße','2 EL'],['Brauner Zucker','1 EL'],['Zitronengras (fein)','1 Stange'],['Knoblauch','3 Zehen'],['Limettensaft','2 EL']],
- marinade_zeit:'3h+',
- zutaten:[['Chicken Wings','1 kg'],['Kokosmilch','100 ml'],['Frischer Koriander','3 EL'],['Limette','1'],['Rote Chili','1']],
- schritte:['Mind. 3h marinieren – je länger desto besser (bis 12h).',
-   '<strong>Air Fryer:</strong> 190°C, 24 Min. Nach 12 Min wenden.',
-   'Restmarinade + 100 ml Kokosmilch aufkochen, 3 Min eindicken lassen.',
-   'Sauce über Wings. Koriander + Chili + Limette drüber.'],
- tipp:'Zitronengras sehr fein schneiden oder im Mörser zerdrücken damit die Aromen freigesetzt werden. Länger marinieren = deutlich intensiverer Geschmack.'},
-{n:10, ico:'🍺', title:'Beer & Smoked Paprika Wings',
- sub:'Bier-Marinade · Smoked Paprika · BBQ · Rustikal',
- heat:'mild', zeit:'28 Min', geraet:['Air Fryer','Backofen'],
- marinade:[['Dunkles Bier (Märzen/Stout)','200 ml'],['Smoked Paprika','2 TL'],['Knoblauch','4 Zehen'],['Worcestershire','1 EL'],['Dijon-Senf','1 EL'],['Olivenöl','2 EL'],['Brauner Zucker','1 EL'],['Salz','1 TL']],
- marinade_zeit:'4h+',
- zutaten:[['Chicken Wings','1 kg'],['BBQ Sauce','3 EL'],['Frische Petersilie','2 EL']],
- schritte:['Mind. 4h marinieren. Bier-Marinade macht das Fleisch besonders zart.',
-   'Wings abtropfen, trocken tupfen.',
-   '<strong>Air Fryer:</strong> 200°C, 22 Min. Nach 12 Min wenden.',
-   'Mit BBQ Sauce glasieren. Petersilie drüber.'],
- tipp:'Stout oder Märzen geben den intensivsten Geschmack. Alkohol verdunstet beim Garen vollständig. Bier-Enzyme machen das Fleisch außergewöhnlich zart.'},
-];
-
-'use strict';
-/* ═══════════════════════════════════════════════════════════
-   NAVIGATION
-═══════════════════════════════════════════════════════════ */
-function goTo(sec, btn) {
-  var pages = document.querySelectorAll('.pg');
-  for (var i = 0; i < pages.length; i++) pages[i].classList.remove('on');
-  var tabs = document.querySelectorAll('.nt');
-  for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('on');
-  var pg = document.getElementById('pg-' + sec);
-  if (pg) pg.classList.add('on');
-  var matchTab = document.querySelector('.nt[data-s="' + sec + '"]');
-  if (matchTab) matchTab.classList.add('on');
-  else if (btn) btn.classList.add('on');
-  window.scrollTo(0, 0);
-}
-
-/* ═══════════════════════════════════════════════════════════
-   CARD OPEN/CLOSE
-═══════════════════════════════════════════════════════════ */
-function toggleCard(card) {
-  card.classList.toggle('on');
-}
-
-/* ═══════════════════════════════════════════════════════════
-   PORTION SELECTOR
-═══════════════════════════════════════════════════════════ */
-function changePortion(btn, delta) {
-  var bar = btn.parentElement;
-  var cur = parseInt(bar.getAttribute('data-cur'), 10);
-  var base = parseInt(bar.getAttribute('data-base'), 10);
-  cur = Math.max(1, Math.min(20, cur + delta));
-  bar.setAttribute('data-cur', cur);
-  bar.querySelector('.portion-val').textContent = cur;
-  var ratio = cur / base;
-  var card = bar;
-  while (card && !card.classList.contains('card')) card = card.parentElement;
-  if (!card) return;
-  var tds = card.querySelectorAll('td.qty');
-  for (var i = 0; i < tds.length; i++) {
-    var td = tds[i];
-    var orig = td.getAttribute('data-orig');
-    if (!orig) { td.setAttribute('data-orig', td.textContent); orig = td.textContent; }
-    var m = orig.match(/^([0-9.,]+)\s*(.*)$/);
-    if (m) {
-      var num = parseFloat(m[1].replace(',', '.'));
-      if (!isNaN(num)) {
-        var nv = Math.round(num * ratio * 10) / 10;
-        td.textContent = (Number.isInteger(nv) ? nv : nv.toFixed(1)) + (m[2] ? ' ' + m[2] : '');
-        continue;
-      }
-    }
-    td.textContent = orig;
-  }
-}
-
-/* ═══════════════════════════════════════════════════════════
-   HTML BUILDERS (string concatenation only - iOS safe)
-═══════════════════════════════════════════════════════════ */
-function mkTable(rows) {
-  if (!rows || !rows.length) return '';
-  var html = '';
-  for (var i = 0; i < rows.length; i++) {
-    html += '<tr><td>' + (rows[i][0] || '') + '</td><td class="qty">' + (rows[i][1] || '') + '</td></tr>';
-  }
-  return html;
-}
-
-function mkSteps(steps) {
-  if (!steps || !steps.length) return '';
-  var html = '';
-  for (var i = 0; i < steps.length; i++) {
-    html += '<li>' + (steps[i] || '') + '</li>';
-  }
-  return html;
-}
-
-function mkTags(tags) {
-  if (!tags || !tags.length) return '';
-  var html = '';
-  for (var i = 0; i < tags.length; i++) {
-    var t = tags[i];
-    if (typeof t === 'string') {
-      html += '<span class="tag tw">' + t + '</span>';
-    } else {
-      html += '<span class="tag ' + (t.c || t.cls || 'tw') + '">' + (t.t || t.txt || '') + '</span>';
-    }
-  }
-  return html;
-}
-
-function mkPortionBar(base) {
-  return '<div class="portion" data-base="' + base + '" data-cur="' + base + '">'
-    + '<span class="portion-lbl">🍽️ Portionen</span>'
-    + '<button class="portion-btn" onclick="changePortion(this,-1)">−</button>'
-    + '<span class="portion-val">' + base + '</span>'
-    + '<button class="portion-btn" onclick="changePortion(this,+1)">+</button>'
-    + '</div>';
-}
-
-function mkCard(ico, title, sub, tags, body, extraClass) {
-  var cls = 'card' + (extraClass ? ' ' + extraClass : '');
-  var html = '<div class="' + cls + '">'
-    + '<div class="chd">'
-    + '<div class="cico">' + ico + '</div>'
-    + '<div class="cinf">'
-    + '<div class="ctitle">' + title + '</div>'
-    + '<div class="csub">' + sub + '</div>'
-    + '<div class="ctags">' + tags + '</div>'
-    + '</div>'
-    + '<span class="chev">▾</span>'
-    + '</div>'
-    + '<div class="cbd"><div class="cin">' + body + '</div></div>'
-    + '</div>';
-  var tmp = document.createElement('div');
-  tmp.innerHTML = html;
-  var card = tmp.firstChild;
-  card.querySelector('.chd').addEventListener('click', function() {
-    toggleCard(card);
-  });
-  return card;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   FILTER HELPERS
-═══════════════════════════════════════════════════════════ */
-function setActiveFilter(barId, btn) {
-  var bar = document.getElementById(barId);
-  if (!bar) return;
-  var btns = bar.querySelectorAll('.fb');
-  for (var i = 0; i < btns.length; i++) btns[i].classList.remove('on');
-  btn.classList.add('on');
-}
-
-function updateCount(countId, vis, total) {
-  var el = document.getElementById(countId);
-  if (!el) return;
-  el.innerHTML = vis < total ? '<b>' + vis + '</b> von ' + total + ' Rezepten' : '';
-}
-
-/* ═══════════════════════════════════════════════════════════
-   DATA DECLARATIONS
-═══════════════════════════════════════════════════════════ */
-const D_BLITZ = [
+const BLITZ = [
 
 // ─── NUDELN ───────────────────────────────────────
 // ─── NUDELN ───────────────────────────────────────
@@ -1509,7 +1313,7 @@ const D_BLITZ = [
 },
 
 ];
-const D_TIPPS = [
+const BLITZ_TIPPS = [
 {ico:'🌬️',col:'var(--heat)',title:'Air Fryer: 10 Goldregeln',items:[
  '200°C ist nicht immer besser – 190°C gibt gleichmäßigeres Garen',
  'Nie zu voll laden – lieber zwei Runden. Luft muss zirkulieren',
@@ -1559,6 +1363,9 @@ const D_TIPPS = [
  'Beim Einkauf: immer Reisnudeln, Rote Linsen und Kichererbsen vorrätig',
 ]},
 ];
+</script>
+
+<script>
 const BURGER = [
 
 // ── RIND (12) ────────────────────────────────────────────────────
@@ -1972,7 +1779,7 @@ const PANIERT = [
 {n:'P01',icon:'🍗',
  title:'Classic Buttermilch-Panko',
  sub:'Die Grundlage · luftig-knusprig · universell',
- tags:[{c:'ty',t:'Basis-Rezept'},{c:'ts',t:'⚡ 25 Min'}],
+ tags:[{c:'ty',t:'Basis-Rezept'},{c:'ta',t:'⚡ 25 Min'}],
  patty:{label:'Buttermilch-Marinade 2h+',items:[['Hähnchenbrust oder -schenkel','500 g'],['Buttermilch','250 ml'],['Salz','1 TL'],['Knoblauchpulver','1 TL'],['Paprikapulver','1 TL']]},
  zut:[['Panko','150 g'],['Mehl','80 g'],['Ei','2'],['Paprika scharf','1 TL'],['Knoblauchpulver','1 TL'],['Zwiebelpulver','½ TL'],['Salz & Pfeffer','nach Geschm.'],['Rapsöl-Spray','für AF']],
  steps:['Mind. 2h (besser über Nacht) in Buttermilch marinieren.',
@@ -1986,7 +1793,7 @@ const PANIERT = [
 {n:'P02',icon:'🧀',
  title:'Parmesan-Herb Paniert',
  sub:'Parmesan + Panko + Kräuter · Goldene Käsekruste',
- tags:[{c:'ts',t:'Käsekruste'},{c:'ts',t:'⚡ 20 Min'}],
+ tags:[{c:'ta',t:'Käsekruste'},{c:'ta',t:'⚡ 20 Min'}],
  patty:{label:'Kein Marinieren nötig',items:[['Hähnchenstreifen oder Brust','400 g'],['Olivenöl','1 EL'],['Salz & Pfeffer','nach Geschm.']]},
  zut:[['Parmesan fein gerieben','80 g'],['Panko','80 g'],['Oregano getrocknet','1 TL'],['Basilikum getrocknet','½ TL'],['Knoblauchpulver','1 TL'],['Olivenöl','1 EL'],['Ei','2']],
  steps:['Parmesan + Panko + Kräuter + Knoblauchpulver gut mischen.',
@@ -1999,7 +1806,7 @@ const PANIERT = [
 {n:'P03',icon:'🌶️',
  title:'Nashville Hot Chicken Strips',
  sub:'Scharf · Buttermilch · Hot Oil · Pickles',
- tags:[{c:'tr',t:'🌶️🌶️🌶️ Sehr scharf'},{c:'ts',t:'⏱ 30 Min'}],
+ tags:[{c:'tr',t:'🌶️🌶️🌶️ Sehr scharf'},{c:'ta',t:'⏱ 30 Min'}],
  patty:{label:'Buttermilch-Hot Marinade 1h',items:[['Hähnchenstreifen','500 g'],['Buttermilch','200 ml'],["Franks Red Hot",'3 EL'],['Knoblauchpulver','1 TL'],['Cayenne','1 TL']]},
  zut:[['Panko','120 g'],['Mehl','60 g'],['Paprika scharf','2 TL'],['Rapsöl','4 EL'],['Cayennepfeffer','2 TL'],['Brauner Zucker','1 TL'],['Paprika','1 TL'],['Salz','½ TL']],
  steps:['1h marinieren.',
@@ -2012,7 +1819,7 @@ const PANIERT = [
 {n:'P04',icon:'🇯🇵',
  title:'Katsu – Japanische Methode',
  sub:'Feiner Panko · Gleichmäßig goldbraun · Tonkatsu',
- tags:[{c:'tl',t:'🇯🇵 Japanisch'},{c:'ts',t:'⏱ 25 Min'}],
+ tags:[{c:'tb',t:'🇯🇵 Japanisch'},{c:'ta',t:'⏱ 25 Min'}],
  patty:{label:'Katsu-Vorbereitung',items:[['Hähnchenbrust (1,5 cm plattiert)','2 Stück'],['Salz & Pfeffer','nach Geschm.']]},
  zut:[['Mehl','60 g'],['Ei','2'],['Feiner Panko (Japonés)','150 g'],['Rapsöl','für die Pfanne'],['Tonkatsu-Sauce','zum Servieren']],
  steps:['Hähnchen auf exakt 1,5 cm plattieren – gleichmäßig ist entscheidend.',
@@ -2025,7 +1832,7 @@ const PANIERT = [
 {n:'P05',icon:'🥥',
  title:'Coconut-Panko Chicken',
  sub:'Kokosraspeln + Panko · Süßlich-knusprig · Tropical',
- tags:[{c:'ts',t:'🥥 Kokos'},{c:'ts',t:'⚡ 20 Min'}],
+ tags:[{c:'ta',t:'🥥 Kokos'},{c:'ta',t:'⚡ 20 Min'}],
  patty:{label:'Kokosmilch statt Ei',items:[['Hähnchenstreifen','400 g'],['Kokosmilch','100 ml'],['Limettensaft','1 EL'],['Salz','½ TL']]},
  zut:[['Panko','80 g'],['Kokosraspeln','60 g'],['Mehl','50 g'],['Ingwerpulver','½ TL'],['Chiliflocken','¼ TL'],['Kokosmilch','zum Wenden']],
  steps:['Streifen in Kokosmilch tauchen.',
@@ -2038,7 +1845,7 @@ const PANIERT = [
 {n:'P06',icon:'⚡',
  title:'Blitz-Cornflake Chicken',
  sub:'Cornflakes-Panade · 15 Minuten · Mega-Crispy',
- tags:[{c:'tr',t:'⚡ 15 Min'},{c:'ts',t:'Cornflakes-Trick'},{c:'ts',t:'Blitz'}],
+ tags:[{c:'tr',t:'⚡ 15 Min'},{c:'ta',t:'Cornflakes-Trick'},{c:'ta',t:'Blitz'}],
  patty:{label:'Kein Marinieren',items:[['Hähnchenstreifen','400 g'],['Olivenöl','1 EL'],['Salz & Pfeffer','nach Geschm.']]},
  zut:[['Cornflakes (zerkrümelt)','100 g'],['Panko','50 g'],['Paprikapulver','1 TL'],['Knoblauchpulver','1 TL'],['Ei','2'],['Salz','nach Geschm.']],
  steps:['Cornflakes in Tüte geben, mit Nudelholz grob zerbröseln.',
@@ -2051,7 +1858,7 @@ const PANIERT = [
 {n:'P07',icon:'🧄',
  title:'Doppelpanade (Double-Dipped)',
  sub:'Zweimal paniert · Maximale Kruste · Profi-Technik',
- tags:[{c:'ts',t:'Doppelpanade'},{c:'ts',t:'⏱ 30 Min'},{c:'ts',t:'Profi-Technik'}],
+ tags:[{c:'ta',t:'Doppelpanade'},{c:'ta',t:'⏱ 30 Min'},{c:'ta',t:'Profi-Technik'}],
  patty:{label:'Buttermilch-Marinade 2h',items:[['Hähnchenbrust plattiert','2 Stück'],['Buttermilch','250 ml'],['Knoblauchpulver','1 TL'],['Zwiebelpulver','1 TL'],['Salz','1 TL']]},
  zut:[['Panko','200 g'],['Mehl','100 g'],['Ei','3'],['Paprika','2 TL'],['Knoblauchpulver','2 TL'],['Cayenne','½ TL'],['Salz','nach Geschm.']],
  steps:['2h in Buttermilch marinieren.',
@@ -2063,7 +1870,54 @@ const PANIERT = [
    '<strong>Backofen:</strong> 220°C, 28 Min.'],
  tipp:'Die 5 Minuten Ruhezeit zwischen den Runden ist entscheidend – dann haftet die zweite Schicht perfekt. Doppelpanade überlebt auch Saucen ohne aufzuweichen.'},
 ];
-const D_CRISPY = [
+const BURGER_SOSSEN = [
+{gruppe:'🇺🇸 Burger Classics', items:[
+ {e:'🍔',t:'Smash Burger Sauce',s:'Sweet-sour · Der Klassiker',
+  zut:[['Mayo','3 EL'],['Ketchup','1 EL'],['Süße Gurke gehackt','1 EL'],['Weißweinessig','1 TL'],['Zucker','½ TL'],['Zwiebelpulver','¼ TL']],
+  r:'Alles verrühren, 30 Min ziehen.',tip:'Süße Gurken (keine Dills) sind der Trick.'},
+ {e:'🌶️',t:'Chipotle Mayo',s:'Rauchig-scharf · Mexiko',
+  zut:[['Mayo','100 g'],['Chipotle in Adobo püriert','1 EL'],['Limettensaft','1 TL'],['Knoblauch','½ Zehe']],
+  r:'Alles pürieren.',tip:'Chipotle in Adobo im mexikanischen Supermarkt. Unvergleichlich.'},
+ {e:'🧄',t:'Garlic Aioli',s:'Intensiv · Knoblauch',
+  zut:[['Mayo','100 g'],['Knoblauch frisch gerieben','3 Zehen'],['Olivenöl + Zitrone','1 TL je']],
+  r:'Verrühren. 30 Min ziehen.',tip:'Frisch gerieben – nie Knoblauchpulver als Ersatz.'},
+ {e:'🍯',t:'Honey Mustard',s:'Süß-würzig · Universal',
+  zut:[['Mayo','2 EL'],['Dijon-Senf','3 EL'],['Honig','3 EL'],['Apfelessig','1 TL'],['Cayenne','1 Prise']],
+  r:'Verrühren. 15 Min ziehen.',tip:'1:1 Senf zu Honig ist das goldene Verhältnis.'},
+]},
+{gruppe:'🌍 International', items:[
+ {e:'🇯🇵',t:'Wasabi Mayo',s:'Scharf-frisch · Japanisch',
+  zut:[['Mayo','80 g'],['Wasabi-Paste','1-2 TL'],['Sojasoße','½ TL'],['Limettensaft','½ TL']],
+  r:'Verrühren.',tip:'Frischer Wasabi ist 10× besser als Tubenware.'},
+ {e:'🇰🇷',t:'Gochujang Sauce',s:'Fermentiert-scharf · Korean',
+  zut:[['Gochujang','2 EL'],['Honig','1 EL'],['Sojasoße','1 EL'],['Sesamöl','1 TL'],['Reisessig','1 TL']],
+  r:'Alles verrühren, kurz erwärmen.',tip:'Über gebratenes Chicken – nie als kalte Sauce.'},
+ {e:'🥭',t:'Mango Chutney',s:'Süß-fruchtig · Tropical',
+  zut:[['Mango reif','1'],['Rote Zwiebel','¼'],['Ingwer','1 TL'],['Apfelessig','2 EL'],['Zucker','1 EL'],['Chiliflocken','¼ TL']],
+  r:'15 Min köcheln. TM7: 15 Min/90°C/Stufe 1.',tip:'Zu Halloumi und Coconut Chicken unschlagbar.'},
+ {e:'🫙',t:'Tzatziki',s:'Griechisch · Frisch-kühl',
+  zut:[['Joghurt 0%','150 g'],['Gurke ausgedrückt','½'],['Knoblauch','1 Zehe'],['Dill','1 EL'],['Olivenöl + Zitrone','1 TL je']],
+  r:'Gurke raspeln+ausdrücken. Alles verrühren. 1h ziehen.',tip:'Gurke WIRKLICH gut ausdrücken – sonst wässrig.'},
+]},
+{gruppe:'💚 Healthy Sauces', items:[
+ {e:'🥑',t:'Avocado Crème',s:'LDL-freundlich · cremig',
+  zut:[['Avocado','1'],['Joghurt 0%','2 EL'],['Limette','1 EL'],['Knoblauch','½ Zehe'],['Cayenne + Salz','nach Geschm.']],
+  r:'Pürieren.',tip:'Joghurt verhindert schnelles Braunwerden.'},
+ {e:'🌿',t:'Kräuter-Joghurt',s:'Leicht · Proteinreich',
+  zut:[['Joghurt 0%','150 g'],['Petersilie+Schnittlauch','2 EL'],['Knoblauch','½ Zehe'],['Zitrone + Olivenöl','1 TL je']],
+  r:'Kräuter hacken, verrühren.',tip:'Universal für Chicken und Turkey Burger.'},
+ {e:'🫙',t:'Tahini Sauce',s:'Nussig · Orientalisch · LDL-gut',
+  zut:[['Tahini','4 EL'],['Zitronensaft','3 EL'],['Knoblauch','1 Zehe'],['Wasser kalt','3-4 EL'],['Salz','nach Geschm.']],
+  r:'Tahini+Zitrone rühren (erst fest), Wasser löffelweise rein.',tip:'Sesamin in Tahini senkt nachweislich LDL.'},
+ {e:'🔴',t:'Sriracha Mayo',s:'Scharf-einfach · 2 Zutaten',
+  zut:[['Mayo','100 g'],['Sriracha','2-3 EL'],['Limettensaft','1 TL'],['Sesamöl','½ TL']],
+  r:'Verrühren.',tip:'Die einfachste Sauce der Welt – unschlagbar zu allem.'},
+]},
+];
+</script>
+
+<script>
+const CRISPY = [
   // ── BURGER ──────────────────────────────────────────
   {
     emoji: '🍔',
@@ -2707,7 +2561,7 @@ const D_CRISPY = [
     tipp: 'Rotkohl enthält Anthocyane – starke Antioxidantien. Tahini liefert Sesamin, das nachweislich LDL senkt und HDL erhöht. Vollkornpita statt Weißmehl für bessere Blutzuckerstabilität.',
   },
 ];
-const D_CSOSS = [
+const CRISPY_SOSSEN = [
   // ── KLASSIKER ──────────────────────────────────
   {
     gruppe: '🇺🇸 Klassiker',
@@ -2975,7 +2829,10 @@ const D_CSOSS = [
     ]
   },
 ];
-const D_CURRY = [
+</script>
+
+<script>
+const CURRY = [
 
   // ══════════════════════════════════════════
   // CURRY
@@ -4274,7 +4131,10 @@ const D_CURRY = [
     tipp: 'Griechische Fasolakia – einfachstes und gesündestes Gericht der Mittelmeerküche. Das großzügige Olivenöl ist keine Kalorienbombe sondern medizinisch wirksam für Herzgesundheit. Mit Vollkornbrot und Feta servieren.',
   },
 ];
-const D_AUF = [
+</script>
+
+<script>
+const AUF = [
   {
     emoji: '🫘',
     title: 'Klassischer Hummus',
@@ -4556,78 +4416,116 @@ const D_AUF = [
     tipp: 'Der absolute Klassiker. Sehr proteinreich, kalorienarm. Hält 3 Tage.',
   },
 ];
-const D_BSOSS = [
+const WINGS = [
+{n:1,ico:'🍯',title:'Honey Garlic Sticky Wings',sub:'Honig · Knoblauch · Sojasoße · glasiert',kat:'wings',heat:'mild',zeit:'25 Min',geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Marinade (30 Min)',zutaten:[['Sojasoße','3 EL'],['Honig','3 EL'],['Knoblauch (gerieben)','4 Zehen'],['Olivenöl','1 EL'],['Ingwer','1 TL']]},
+ zutaten:[['Chicken Wings','1 kg'],['Sesam','1 EL'],['Frühlingszwiebeln','3']],
+ schritte:['Wings 30 Min in Marinade (besser über Nacht).','<strong>AF:</strong> 200°C, 22 Min, nach 12 Min wenden.','Restmarinade 3 Min einkochen bis dickflüssig.','Wings in Glaze schwenken. Sesam + Frühlingszwiebeln drüber.'],
+ tipp:'Wings trocken tupfen vor dem Fryer. Glaze NACH dem Garen, nie vorher.'},
+{n:2,ico:'🌶️',title:'Nashville Hot Wings',sub:'Buttermilch · Cayenne · Hot Oil · Iconic',kat:'wings',heat:'sehr scharf',zeit:'30 Min',geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Marinade (2h+)',zutaten:[['Buttermilch','300 ml'],['Franks Hot Sauce','3 EL'],['Salz','1 TL'],['Knoblauchpulver','1 TL'],['Cayenne','1 TL']]},
+ zutaten:[['Chicken Wings','1 kg'],['Mehl','80 g'],['Rapsöl','4 EL'],['Cayenne','2 TL'],['Brauner Zucker','1 TL'],['Smoked Paprika','1 TL'],['Salz','½ TL']],
+ schritte:['Mind. 2h in Buttermilch-Marinade, besser über Nacht.','Mehl + Paprika mischen. Wings abtropfen, in Mehl wenden.','<strong>AF:</strong> 200°C, 22 Min, nach 12 Min wenden.','<strong>Hot Oil:</strong> Rapsöl auf 170°C. Gewürze rein, sofort rühren. Über Wings giessen.'],
+ tipp:'Hot Oil IMMER nach dem Garen. Für weniger Schärfe: 1 TL Cayenne statt 2.'},
+{n:3,ico:'🇰🇷',title:'Korean Gochujang Wings',sub:'Gochujang · Honig · Sesamöl · Double Crispy',kat:'wings',heat:'mittel',zeit:'28 Min',geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Marinade (1h)',zutaten:[['Sojasoße','2 EL'],['Sesamöl','1 TL'],['Knoblauch','3 Zehen'],['Ingwer','1 TL'],['Reisessig','1 EL']]},
+ zutaten:[['Chicken Wings','1 kg'],['Gochujang','3 EL'],['Honig','2 EL'],['Sojasoße','1 EL'],['Butter','1 EL'],['Sesam','2 TL'],['Frühlingszwiebeln','4']],
+ schritte:['1h marinieren, trocken tupfen.','<strong>AF Doppelrunde:</strong> 180°C 12 Min – kurze Pause – 200°C 10 Min.','Gochujang + Honig + Sojasoße + Butter warm rühren.','Wings in Glaze schwenken. Sesam + Frühlingszwiebeln drüber.'],
+ tipp:'Doppelrunde = Korea-Geheimnis: erst garen, dann Kruste knusprig blasen.'},
+{n:4,ico:'🧄',title:'Parmesan Garlic Wings',sub:'Parmesan · Knoblauchbutter · Kräuter · Gourmet',kat:'wings',heat:'mild',zeit:'25 Min',geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Marinade (30 Min)',zutaten:[['Olivenöl','3 EL'],['Knoblauchpulver','1 TL'],['Salz','1 TL'],['Oregano','1 TL']]},
+ zutaten:[['Chicken Wings','1 kg'],['Butter','40 g'],['Knoblauch (gerieben)','5 Zehen'],['Parmesan (fein)','60 g'],['Petersilie','3 EL'],['Zitronensaft','1 EL']],
+ schritte:['Wings mit Marinade einreiben, 30 Min ziehen.','<strong>AF:</strong> 200°C, 20–22 Min, nach 12 Min wenden.','Butter schmelzen, Knoblauch 1 Min sanft anschwitzen (nicht braten!).','Wings in Knoblauchbutter wenden. Parmesan + Petersilie drüber.'],
+ tipp:'Knoblauch NIE braun werden lassen. Parmesan direkt auf heisse Wings = schmilzt leicht.'},
+{n:5,ico:'🍋',title:'Lemon Pepper Wings',sub:'Zitrone · Schwarzer Pfeffer · Butter · Klassiker',kat:'wings',heat:'mild',zeit:'22 Min',geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Marinade (30 Min)',zutaten:[['Olivenöl','2 EL'],['Zitrone Saft + Abrieb','2 Stück'],['Schwarzer Pfeffer grob','2 TL'],['Salz','1 TL'],['Knoblauchpulver','1 TL']]},
+ zutaten:[['Chicken Wings','1 kg'],['Butter','30 g'],['Zitronenabrieb','1 Zitrone'],['Schwarzer Pfeffer grob','1 TL'],['Petersilie','2 EL']],
+ schritte:['Wings mit Marinade einreiben, 30 Min ziehen.','<strong>AF:</strong> 200°C, 20–22 Min, nach 11 Min wenden.','Butter schmelzen, Zitronenabrieb + groben Pfeffer einrühren.','Wings in Lemon-Pepper-Butter wenden. Petersilie drüber.'],
+ tipp:'Zitronenabrieb enthält ätherische Öle – gibt das intensive Aroma. Frisch, nicht getrocknet!'},
+{n:6,ico:'🫙',title:'Teriyaki Wings mit Mirin',sub:'Japanische Glasur · Mirin · Sake · Sesam',kat:'wings',heat:'mild',zeit:'28 Min',geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Marinade (2h)',zutaten:[['Sojasoße','4 EL'],['Mirin','3 EL'],['Sake oder trockener Sherry','2 EL'],['Brauner Zucker','1 EL'],['Ingwer gerieben','1 TL'],['Knoblauch','2 Zehen']]},
+ zutaten:[['Chicken Wings','1 kg'],['Sesam','2 TL'],['Frühlingszwiebeln','4'],['Sesamöl','1 TL']],
+ schritte:['2h marinieren, Marinade aufbewahren.','<strong>AF:</strong> 200°C, 22 Min, nach 12 Min wenden.','Restmarinade + 1 TL Stärke: 3 Min einkochen bis sirupartig.','Wings glasieren. Sesamöl + Sesam + Frühlingszwiebeln drüber.'],
+ tipp:'Mirin ist Pflicht – kein Reisessig als Ersatz. Marinade VOR Verwendung als Sauce immer aufkochen.'},
+{n:7,ico:'🔥',title:'Chipotle Smoked Wings',sub:'Chipotle in Adobo · Rauchig · BBQ-Style',kat:'wings',heat:'mittel-scharf',zeit:'28 Min',geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Marinade (2h+)',zutaten:[['Chipotle in Adobo püriert','2 EL'],['Olivenöl','2 EL'],['Brauner Zucker','1 EL'],['Knoblauch','3 Zehen'],['Kreuzkümmel','1 TL'],['Limettensaft','2 EL'],['Salz','1 TL']]},
+ zutaten:[['Chicken Wings','1 kg'],['Limette','1'],['Koriander','3 EL'],['Joghurt 0%','zum Dippen']],
+ schritte:['Mind. 2h marinieren – Rauchgeschmack braucht Zeit.','<strong>AF:</strong> 190°C, 24 Min, nach 12 Min wenden.','Limettensaft drüber, Koriander drüber.','Mit Joghurt-Dip servieren.'],
+ tipp:'Chipotle in Adobo = echter Rauchgeschmack ohne Räuchern. Im mexikanischen Supermarkt oder online.'},
+{n:8,ico:'🫐',title:'Buffalo Blue Cheese Wings',sub:'Franks Hot · Butter · Blue Cheese Dip',kat:'wings',heat:'scharf',zeit:'25 Min',geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Marinade (1h)',zutaten:[['Buttermilch','250 ml'],['Franks Hot Sauce','2 EL'],['Salz','1 TL'],['Knoblauchpulver','1 TL']]},
+ zutaten:[['Chicken Wings','1 kg'],['Franks Hot Sauce','100 ml'],['Butter','50 g'],['Frischkäse','80 g'],['Saure Sahne','40 g'],['Blauschimmelkäse','40 g'],['Staudensellerie','4 Stangen']],
+ schritte:['1h in Buttermilch marinieren.','<strong>AF:</strong> 200°C, 22 Min, nach 12 Min wenden.','Butter schmelzen + Hot Sauce einrühren.','<strong>Blue Cheese Dip:</strong> Frischkäse + Saure Sahne glatt + Käse stückig. Wings in Sauce, Sellerie + Dip dazu.'],
+ tipp:'Sellerie-Sticks kühlen und balancieren die fettige Schärfe. Der Kontrast ist das Erlebnis.'},
+{n:9,ico:'🥥',title:'Coconut Curry Wings',sub:'Kokosmilch · Currypaste · Zitronengras · Thai',kat:'wings',heat:'mittel',zeit:'30 Min',geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Marinade (3h+)',zutaten:[['Kokosmilch','150 ml'],['Rote Currypaste','2 EL'],['Fischsosse oder Sojasosse','2 EL'],['Brauner Zucker','1 EL'],['Zitronengras fein','1 Stange'],['Knoblauch','3 Zehen'],['Limettensaft','2 EL']]},
+ zutaten:[['Chicken Wings','1 kg'],['Kokosmilch','100 ml'],['Koriander frisch','3 EL'],['Limette','1'],['Rote Chili','1']],
+ schritte:['Mind. 3h marinieren – je länger desto besser (bis 12h).','<strong>AF:</strong> 190°C, 24 Min, nach 12 Min wenden.','Restmarinade + 100ml Kokosmilch aufkochen, 3 Min eindicken.','Sauce über Wings. Koriander + Chili + Limette drüber.'],
+ tipp:'Zitronengras sehr fein schneiden oder im Mörser zerdrücken. Länger marinieren = deutlich intensiver.'},
+{n:10,ico:'🍺',title:'Beer & Smoked Paprika Wings',sub:'Bier-Marinade · Smoked Paprika · BBQ · Rustikal',kat:'wings',heat:'mild',zeit:'28 Min',geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Marinade (4h+)',zutaten:[['Dunkles Bier Märzen oder Stout','200 ml'],['Smoked Paprika','2 TL'],['Knoblauch','4 Zehen'],['Worcestershire','1 EL'],['Dijon-Senf','1 EL'],['Olivenöl','2 EL'],['Brauner Zucker','1 EL'],['Salz','1 TL']]},
+ zutaten:[['Chicken Wings','1 kg'],['BBQ Sauce','3 EL'],['Petersilie frisch','2 EL']],
+ schritte:['Mind. 4h marinieren – Bier-Enzyme machen Fleisch zart.','Wings abtropfen, trocken tupfen.','<strong>AF:</strong> 200°C, 22 Min, nach 12 Min wenden.','BBQ Sauce drüber glasieren. Petersilie drüber.'],
+ tipp:'Stout oder Märzen geben intensivsten Geschmack. Alkohol verdunstet beim Garen vollständig.'},
+];
+
+const EXTRA_BURGER_SOSSEN = [
 {gruppe:'🇺🇸 Klassiker',items:[
- {e:'🍔',t:'Smash Sauce',s:'Sweet-sour',heat:2,zutaten:[['Mayo','3 EL'],['Ketchup','1 EL'],['Gurken (fein)','1 EL'],['Essig','1 TL'],['Zwiebelpulver','¼ TL']],rezept:'Alles verrühren, 30 Min ziehen.',tipp:'Süße Gurken – keine Dill-Gurken!'},
- {e:'🔴',t:'Big Mac Sauce',s:'Original nachgebaut',heat:2,zutaten:[['Mayo','4 EL'],['Saure Sahne','1 EL'],['Gürkchen','1 EL'],['Gelber Senf','1 TL'],['Paprikapulver','¼ TL'],['Essig','1 TL']],rezept:'Alles verrühren, mind. 1h ziehen.',tipp:'Über Nacht = bestes Ergebnis.'},
- {e:'🍯',t:'Honey Mustard',s:'Süß-würzig',heat:2,zutaten:[['Mayo','2 EL'],['Dijon-Senf','3 EL'],['Honig','3 EL']],rezept:'Alles verrühren.',tipp:'1:1 Senf zu Honig.'},
- {e:'🧄',t:'Garlic Aioli',s:'Intensiv',heat:2,zutaten:[['Mayo','100 g'],['Knoblauch (gerieben)','3 Zehen'],['Olivenöl','1 TL']],rezept:'Alles verrühren, 30 Min ziehen.',tipp:'Frischer Knoblauch – nie Pulver.'},
- {e:'🌿',t:'Ranch',s:'Mild · Kräuter',heat:1,zutaten:[['Mayo','80 g'],['Saure Sahne','80 g'],['Dill','1 EL'],['Petersilie','1 EL']],rezept:'Alles verrühren.',tipp:'Frische Kräuter.'},
+ {e:'🍔',t:'Smash Sauce',s:'Sweet-sour · Klassiker',heat:2,zutaten:[['Mayo','3 EL'],['Ketchup','1 EL'],['Gurken (fein)','1 EL'],['Essig','1 TL'],['Zwiebelpulver','¼ TL']],rezept:'Alles verrühren, 30 Min ziehen.',tipp:'Süsse Gurken – keine Dill-Gurken!'},
+ {e:'🔴',t:'Big Mac Sauce',s:'Original nachgebaut',heat:2,zutaten:[['Mayo','4 EL'],['Saure Sahne','1 EL'],['Gürkchen fein','1 EL'],['Gelber Senf','1 TL'],['Paprikapulver','¼ TL'],['Essig','1 TL']],rezept:'Alles verrühren, mind. 1h ziehen.',tipp:'Über Nacht = bestes Ergebnis.'},
+ {e:'🍯',t:'Honey Mustard',s:'Süss-würzig',heat:2,zutaten:[['Mayo','2 EL'],['Dijon-Senf','3 EL'],['Honig','3 EL']],rezept:'Alles verrühren.',tipp:'1:1 Senf zu Honig.'},
+ {e:'🧄',t:'Garlic Aioli',s:'Intensiv · Mediterran',heat:2,zutaten:[['Mayo','100 g'],['Knoblauch gerieben','3 Zehen'],['Olivenöl','1 TL']],rezept:'Alles verrühren, 30 Min ziehen.',tipp:'Frischer Knoblauch – nie Pulver.'},
 ]},
 {gruppe:'🌶️ Scharf',items:[
- {e:'🌶️',t:'Sriracha Mayo',s:'Scharf',heat:6,zutaten:[['Mayo','100 g'],['Sriracha','2-3 EL'],['Limettensaft','1 TL']],rezept:'Alles verrühren.',tipp:'Passt zu allem.'},
- {e:'🦬',t:'Buffalo Sauce',s:'Butterig-scharf',heat:7,zutaten:[["Franks Hot",'120 ml'],['Butter','60 g']],rezept:'Butter schmelzen, Hot Sauce zugeben.',tipp:'Mehr Butter = milder.'},
- {e:'🌶️',t:'Nashville Hot Oil',s:'Iconic',heat:8,zutaten:[['Rapsöl','4 EL'],['Cayenne','2 TL'],['Paprika scharf','1 TL'],['Brauner Zucker','1 TL']],rezept:'Öl erhitzen, Gewürze rein.',tipp:'Immer NACH dem Braten!'},
- {e:'🔴',t:'Chipotle Mayo',s:'Rauchig-scharf',heat:6,zutaten:[['Mayo','100 g'],['Chipotle in Adobo','1 EL'],['Limettensaft','1 TL']],rezept:'Alles pürieren.',tipp:'Chipotle in Adobo beim mexikanischen Händler.'},
- {e:'🇰🇷',t:'Gochujang',s:'Korean',heat:6,zutaten:[['Gochujang','2 EL'],['Honig','1 EL'],['Sojasoße','1 EL'],['Sesamöl','1 TL']],rezept:'Verrühren, kurz erwärmen.',tipp:'Nie kalt.'},
- {e:'🔥',t:'Reaper Mayo',s:'EXTREM',heat:10,zutaten:[['Mayo','100 g'],['Reaper-Sauce','1-2 TL'],['Honig','1 TL']],rezept:'Vorsicht – erst wenig testen!',tipp:'Handschuhe empfohlen.'},
-]},
-{gruppe:'🧀 Käse & Cremig',items:[
- {e:'🫐',t:'Blue Cheese Dip',s:'Würzig',heat:1,zutaten:[['Frischkäse','100 g'],['Saure Sahne','50 g'],['Blauschimmelkäse','50 g']],rezept:'Frischkäse+Saure Sahne glatt, Käse stückig.',tipp:'Roquefort = intensiv.'},
- {e:'🧀',t:'Dijon Mayo',s:'Elegant',heat:2,zutaten:[['Mayo','80 g'],['Dijon-Senf','2 EL'],['Honig','½ TL']],rezept:'Alles verrühren.',tipp:'Für Gourmet-Burger.'},
+ {e:'🌶️',t:'Sriracha Mayo',s:'🌶️🌶️',heat:6,zutaten:[['Mayo','100 g'],['Sriracha','2-3 EL'],['Limettensaft','1 TL']],rezept:'Alles verrühren.',tipp:'Passt zu allem.'},
+ {e:'🦬',t:'Buffalo Sauce',s:'🌶️🌶️🌶️ Butterig-scharf',heat:7,zutaten:[['Franks Hot','120 ml'],['Butter','60 g']],rezept:'Butter schmelzen, Hot Sauce zugeben.',tipp:'Mehr Butter = milder.'},
+ {e:'🌶️',t:'Nashville Hot Oil',s:'🌶️🌶️🌶️🌶️',heat:8,zutaten:[['Rapsöl','4 EL'],['Cayenne','2 TL'],['Paprika scharf','1 TL'],['Brauner Zucker','1 TL']],rezept:'Öl erhitzen, Gewürze rein.',tipp:'Immer NACH dem Braten!'},
+ {e:'🔴',t:'Chipotle Mayo',s:'🌶️🌶️ Rauchig',heat:6,zutaten:[['Mayo','100 g'],['Chipotle in Adobo','1 EL'],['Limettensaft','1 TL']],rezept:'Alles pürieren.',tipp:'Beim mexikanischen Händler.'},
+ {e:'🇰🇷',t:'Gochujang',s:'🌶️🌶️ Korean',heat:6,zutaten:[['Gochujang','2 EL'],['Honig','1 EL'],['Sojasosse','1 EL'],['Sesamöl','1 TL']],rezept:'Verrühren, kurz erwärmen.',tipp:'Nie kalt servieren.'},
 ]},
 {gruppe:'🌍 International',items:[
- {e:'🇯🇵',t:'Wasabi Mayo',s:'Scharf-frisch',heat:5,zutaten:[['Mayo','80 g'],['Wasabi-Paste','1-2 TL'],['Sojasoße','½ TL']],rezept:'Verrühren.',tipp:'Frischer Wasabi ist 10x besser.'},
- {e:'🍫',t:'Smoky BBQ',s:'Süß-würzig',heat:3,zutaten:[['Ketchup','150 ml'],['Brauner Zucker','2 EL'],['Apfelessig','2 EL'],['Worcestershire','1 EL'],['Smoked Paprika','1 TL']],rezept:'10 Min köcheln.',tipp:'Liquid Smoke macht sie intensiver.'},
- {e:'🫒',t:'Chimichurri',s:'Argentinisch',heat:3,zutaten:[['Petersilie','1 Bund'],['Knoblauch','4 Zehen'],['Olivenöl','6 EL'],['Rotweinessig','2 EL'],['Chiliflocken','½ TL']],rezept:'Alles fein hacken, 30 Min ziehen.',tipp:'Messer statt Mixer.'},
+ {e:'🫒',t:'Chimichurri',s:'Argentinisch · Frisch',heat:3,zutaten:[['Petersilie','1 Bund'],['Knoblauch','4 Zehen'],['Olivenöl','6 EL'],['Rotweinessig','2 EL'],['Chiliflocken','½ TL']],rezept:'Alles fein hacken (Messer!), 30 Min ziehen.',tipp:'Messer statt Mixer.'},
+ {e:'🍫',t:'Smoky BBQ',s:'Süss-würzig',heat:3,zutaten:[['Ketchup','150 ml'],['Brauner Zucker','2 EL'],['Apfelessig','2 EL'],['Worcestershire','1 EL'],['Smoked Paprika','1 TL']],rezept:'10 Min köcheln.',tipp:'Liquid Smoke macht sie intensiver.'},
  {e:'🔶',t:'Harissa Mayo',s:'Nordafrikanisch',heat:5,zutaten:[['Mayo','80 g'],['Harissa-Paste','2 EL'],['Zitronensaft','1 TL']],rezept:'Alles verrühren.',tipp:'Zu Döner-Burger perfekt.'},
 ]},
-{gruppe:'💚 Healthy',items:[
+{gruppe:'💚 Healthy & Leicht',items:[
  {e:'🥑',t:'Avocado Crème',s:'LDL-freundlich',heat:1,zutaten:[['Avocado','1'],['Joghurt 0%','2 EL'],['Limettensaft','1 EL']],rezept:'Alles pürieren.',tipp:'Joghurt verhindert Oxidation.'},
- {e:'🌿',t:'Kräuter-Joghurt',s:'Leicht',heat:1,zutaten:[['Joghurt 0%','150 g'],['Kräuter','2 EL'],['Zitronensaft','1 TL']],rezept:'Kräuter hacken, verrühren.',tipp:'Universal zu Chicken und Veggie.'},
+ {e:'🌿',t:'Kräuter-Joghurt',s:'Leicht',heat:1,zutaten:[['Joghurt 0%','150 g'],['Kräuter','2 EL'],['Zitronensaft','1 TL']],rezept:'Kräuter hacken, verrühren.',tipp:'Universal.'},
  {e:'🫙',t:'Tahini Sauce',s:'Nussig · LDL-gut',heat:1,zutaten:[['Tahini','4 EL'],['Zitronensaft','3 EL'],['Knoblauch','1 Zehe'],['Wasser kalt','3-4 EL']],rezept:'Tahini+Zitrone rühren, Wasser löffelweise.',tipp:'Eiswasser = extra cremig.'},
 ]},
 ];
-const D_COOK_TIPS = [
-{ico:'🔪',col:'var(--c-blitz)',title:'Grundlegende Techniken',items:['Mise en Place: alle Zutaten VOR dem Kochen bereitlegen','Scharfe Messer sind sicherer als stumpfe','Zwiebeln kühlen – weniger Tränen','Fleisch trocken tupfen vor dem Braten','Pfanne IMMER vorheizen','Pastawasser aufbewahren – emulgiert Saucen','Zitronensaft erst am Ende','Nie zu viel auf einmal braten','Salz in Pastawasser grosszügig','Gemüse kalt und trocken für gute Dressing-Haftung']},
-{ico:'🥩',col:'var(--c-crispy)',title:'Marinieren: Tipps',items:['Joghurt = beste Hähnchen-Marinade','Über Nacht = 3x intensiverer Geschmack','Kein Salz in Marinade wenn länger als 2h','Raumtemperatur 20 Min vor dem Braten','Vakuumbeutel halbiert die Marinierzeit','Säure + Zeit über 24h macht Hähnchen mehlig','Trockenmarinade andrücken, 1h ruhen','Fett transportiert Aromastoffe ins Fleisch','Zitronenabrieb intensiver als Saft','Marinade nicht als Sauce – rohes Fleisch war drin']},
-{ico:'🌡️',col:'var(--c-crispy)',title:'Temperaturen & Garpunkte',items:['Hähnchen: Kerntemperatur 74°C','Tatar: nur vom Metzger – kein Supermarkt-Hack','Miso nie über 90°C','AF 200°C für Crispy, 190°C für gleichmäßiges Garen','TM7 120°C = Brattemperatur','Olivenöl: Rauchpunkt 190°C','Rapsöl fürs scharfe Braten','Fleisch 3-5 Min ruhen lassen','Suppe nie sprudelnd kochen','Thermometer ist Pflicht']},
-{ico:'🧂',col:'var(--c-tipps)',title:'Würzen & Abschmecken',items:['Fehlt etwas? Reihenfolge: Salz, Säure, Süße, Schärfe, Fett','Kurkuma + schwarzer Pfeffer IMMER zusammen','Frische Kräuter erst am Ende','Getrocknete Kräuter früh zugeben','Umami: Tomatenmark, Miso, Parmesan, Sojasoße','1 TL Olivenöl am Ende hebt ein Gericht','Zitronensaft beim Abschmecken hebt alle Aromen','Süße balanciert Schärfe','Salz früh = besser aufgenommen','Chili früh = milder, roh = schärfer']},
-{ico:'⚡',col:'var(--c-blitz)',title:'Air Fryer Mastery',items:['Vorheizen: 3 Min','Nie zu voll laden – Luft muss zirkulieren','Rapsöl-Spray statt flüssiges Öl','Trocken tupfen vor dem Fryer','Wenden nach halber Zeit','Kichererbsen und Tofu: je trockener desto besser','Frischer Knoblauch erst in letzten 3 Min','2-Runden-Methode: 160°C dann 200°C','Backpapier reduziert Luftzirkulation','Metallform = gleichmäßige Hitze']},
-{ico:'⚙️',col:'var(--lav)',title:'TM7 Mastery',items:['Umkehrstufe 1 für alles was ganz bleiben soll','Stufe 5 (5 Sek) = Grob hacken','120°C = Anbraten ohne Spritzen','Pastawasser vor dem Abgießen aufbewahren','Miso nie über 90°C','Rote Linsen: kein Einweichen – 15 Min / 100°C / Stufe 1','TM7 + Air Fryer gleichzeitig = 15-Min-Gericht','Suppen: erst Stufe 5, dann 8, dann 10','Varoma für sanftes Dampfgaren','Beide Geräte gleichzeitig spart die meiste Zeit']},
-{ico:'🛒',col:'var(--c-aufstriche)',title:'Meal Prep & Einkaufen',items:['Immer vorrätig: Dosentomaten, Kichererbsen, Linsen','TK-Gemüse = gleich wie frisch','Kartoffeln vorkochen – ganze Woche Blitz-Kartoffeln','Reis auf Vorrat kochen für Fried Rice','Mikrowellen-Reis rettet 15-Min-Gerichte','Hähnchen einfrieren, über Nacht auftauen','Avocados: 2 reif, 2 hart kaufen','Kräuter in Eiswürfeln mit Olivenöl einfrieren','Saucen halten 1-2 Wochen','Reisnudeln und Kichererbsen immer vorrätig']},
-];
-const D_PANADEN = [
+
+const PANADEN = [
 {t:'🥛 Classic Buttermilch + Panko',b:'Buttermilch macht Fleisch zart, Panko gibt maximale Knusprigkeit',z:'2h+ Marinade',
  marinade:[['Buttermilch','250 ml'],['Salz','1 TL'],['Knoblauchpulver','1 TL'],['Paprikapulver','1 TL']],
- panade:[['Mehl (gewürzt)','80 g'],['Ei','2'],['Panko','150 g'],['Paprikapulver','1 TL'],['Salz & Pfeffer','nach Geschm.']],
+ panade:[['Mehl gewürzt','80 g'],['Ei','2'],['Panko','150 g'],['Paprikapulver','1 TL'],['Salz & Pfeffer','nach Geschm.']],
  methode:'Mehl dann Ei dann Panko. Fest andrücken. AF: 200°C 18 Min. Ofen: 220°C 25 Min.',
- tipp:'Panko wirklich andrücken.'},
-{t:'🌽 Cornflakes-Panade',b:'Ultra-knusprig in kürzester Zeit',z:'Kein Marinieren',
+ tipp:'Panko wirklich andrücken – nicht nur drüberrollen.'},
+{t:'🌽 Cornflakes-Panade',b:'Ultra-knusprige Textur in kürzester Zeit',z:'Kein Marinieren',
  marinade:[['Olivenöl','1 EL'],['Salz & Pfeffer','nach Geschm.']],
- panade:[['Cornflakes (grob)','120 g'],['Panko','50 g'],['Paprikapulver','1 TL'],['Ei','2']],
+ panade:[['Cornflakes grob','120 g'],['Panko','50 g'],['Paprikapulver','1 TL'],['Ei','2']],
  methode:'Cornflakes grob zerbröseln. Hähnchen dann Ei dann Cornflakes. AF: 200°C 14 Min.',
  tipp:'GROB zerbröseln – Stücke geben Textur.'},
 {t:'🧀 Parmesan + Panko Kruste',b:'Parmesan bildet goldene Käsekruste',z:'Kein Marinieren',
  marinade:[['Olivenöl','1 EL']],
- panade:[['Parmesan (fein gerieben)','80 g'],['Panko','80 g'],['Oregano','1 TL'],['Knoblauchpulver','1 TL'],['Ei','2']],
+ panade:[['Parmesan fein gerieben','80 g'],['Panko','80 g'],['Oregano','1 TL'],['Knoblauchpulver','1 TL'],['Ei','2']],
  methode:'Mix mischen. Hähnchen dann Olivenöl dann Ei dann Mix. AF: 190°C 18 Min.',
- tipp:'Feiner Parmesan = gleichmäßigere Kruste.'},
-{t:'🌏 Speisestärke (Asian Style)',b:'Die geheime Crispy-Formel Asiens',z:'30 Min Marinade',
- marinade:[['Sojasoße','2 EL'],['Ingwer + Knoblauch','je 1 TL'],['Sesamöl','½ TL']],
- panade:[['Speisestärke (Maizena)','80 g'],['Salz & Pfeffer','nach Geschm.']],
+ tipp:'Feiner Parmesan = gleichmässigere Kruste.'},
+{t:'🌏 Speisestärke Asian Style',b:'Die geheime Crispy-Formel Asiens',z:'30 Min Marinade',
+ marinade:[['Sojasosse','2 EL'],['Ingwer + Knoblauch','je 1 TL'],['Sesamöl','½ TL']],
+ panade:[['Speisestärke Maizena','80 g'],['Salz & Pfeffer','nach Geschm.']],
  methode:'30 Min marinieren. Trocken tupfen. In Stärke wenden. AF: 190°C 16 Min.',
  tipp:'Doppelrunde: 10+5+8 Min = koreanische Knusprigkeit.'},
-{t:'🌶️ Spicy Cajun Panade',b:'Cajun-Mix gibt Tiefe und Schärfe in der Panade',z:'1h Marinade',
+{t:'🌶️ Spicy Cajun Panade',b:'Cajun-Mix gibt Tiefe und Schärfe',z:'1h Marinade',
  marinade:[['Buttermilch','200 ml'],['Tabasco','1 EL'],['Salz','1 TL']],
  panade:[['Mehl','80 g'],['Ei','2'],['Panko','120 g'],['Cayenne','1 TL'],['Paprika scharf','2 TL']],
  methode:'1h marinieren. Mehl dann Ei dann Cajun-Panko. AF: 200°C 18 Min.',
- tipp:'Schärfe über Cayenne steuern.'},
-{t:'⚡ Doppelpanade',b:'Zweimal paniert – maximale Kruste',z:'2h Marinade',
+ tipp:'Schärfe über Cayenne-Menge steuern.'},
+{t:'⚡ Doppelpanade',b:'Zweimal paniert = maximale Kruste',z:'2h Marinade',
  marinade:[['Buttermilch','250 ml'],['Gewürze nach Wahl','']],
- panade:[['Mehl (gewürzt)','100 g'],['Ei','3'],['Panko','200 g']],
+ panade:[['Mehl gewürzt','100 g'],['Ei','3'],['Panko','200 g']],
  methode:'1. Runde: Mehl-Ei-Panko. 5 Min RUHEN. 2. Runde: Ei-Panko. 5 Min ruhen. AF: 190°C 22 Min.',
- tipp:'Ruhezeit ist entscheidend.'},
+ tipp:'Ruhezeit zwischen Runden ist entscheidend.'},
 {t:'🥥 Kokos-Panko Tropical',b:'Kokosraspeln rösten goldbraun',z:'15 Min',
  marinade:[['Kokosmilch','100 ml'],['Limettensaft','1 EL']],
  panade:[['Panko','80 g'],['Kokosraspeln','60 g'],['Ingwerpulver','½ TL'],['Chiliflocken','¼ TL']],
@@ -4635,58 +4533,97 @@ const D_PANADEN = [
  tipp:'Nicht verbrennen lassen. Gut zu Mango-Chutney.'},
 ];
 
-/* ═══════════════════════════════════════════
-   NAVIGATION
-═══════════════════════════════════════════ */
-function goTo(sec, btn) {
-  var pages = document.querySelectorAll('.pg');
-  for (var i = 0; i < pages.length; i++) pages[i].classList.remove('on');
-  var tabs = document.querySelectorAll('.nt');
-  for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('on');
-  var pg = document.getElementById('pg-' + sec);
-  if (pg) pg.classList.add('on');
-  if (btn) {
-    btn.classList.add('on');
-  } else {
-    var allTabs = document.querySelectorAll('.nt');
-    for (var i = 0; i < allTabs.length; i++) {
-      var oc = allTabs[i].getAttribute('onclick') || '';
-      if (oc.indexOf("'" + sec + "'") >= 0) { allTabs[i].classList.add('on'); break; }
+const COOK_TIPS = [
+{ico:'🔪',col:'var(--blitz)',title:'Grundlegende Techniken',items:['Mise en Place: Alle Zutaten VOR dem Kochen bereitlegen','Scharfe Messer sind sicherer als stumpfe','Zwiebeln kühlen vor dem Schneiden – weniger Tränen','Fleisch trocken tupfen – Feuchtigkeit verhindert Bräunung','Pfanne IMMER vorheizen bevor Fett rein kommt','Pastawasser aufbewahren – emulgiert Saucen cremig','Zitronensaft erst am Ende zugeben','Nie zu viel auf einmal braten – Temperatur fällt zu stark','Salz in Pastawasser: grosszügig','Gemüse kalt und trocken halten – Dressing haftet besser']},
+{ico:'🥩',col:'var(--crispy)',title:'Marinieren: Tipps & Timing',items:['Joghurt ist die beste Marinade für Hähnchen','Über Nacht marinieren = 3x intensiverer Geschmack','Kein Salz in Marinade wenn Fleisch länger als 2h drin','Raumtemperatur 20 Min vor dem Braten','Vakuumbeutel halbiert die Marinierzeit','Trockenmarinade andrücken, 1h ruhen','Fett transportiert Aromastoffe ins Fleisch','Marinade nicht als Sauce – aufkochen oder neu machen','Säure + Zeit über 24h macht Hähnchen mehlig','Zitronenabrieb intensiver als Saft – immer beides']},
+{ico:'🌡️',col:'var(--crispy)',title:'Temperaturen & Garpunkte',items:['Hähnchen: Kerntemperatur 74°C – niemals weniger','Tatar: nur vom Metzger – kein Supermarkt-Hack','Miso nie über 90°C – Probiotika sterben ab','AF 200°C für Crispy, 190°C für gleichmässiges Garen','TM7 120°C = Brattemperatur','Olivenöl: Rauchpunkt 190°C','Rapsöl fürs scharfe Braten','Fleisch 3-5 Min ruhen lassen','Suppe nie sprudelnd kochen','Thermometer ist Pflicht']},
+{ico:'🧂',col:'var(--tipps)',title:'Würzen & Abschmecken',items:['Fehlt etwas? Reihenfolge: Salz, Säure, Süsse, Schärfe, Fett','Kurkuma + schwarzer Pfeffer IMMER zusammen','Frische Kräuter erst am Ende','Getrocknete Kräuter früh zugeben','Umami: Tomatenmark, Miso, Parmesan, Sojasosse','1 TL Olivenöl am Ende hebt ein Gericht','Zitronensaft beim Abschmecken hebt alle Aromen','Süsse balanciert Schärfe','Salz früh = besser aufgenommen','Chili früh = milder, roh = schärfer']},
+{ico:'⚡',col:'var(--blitz)',title:'Air Fryer Mastery',items:['Vorheizen: 3 Min','Nie zu voll laden – Luft muss zirkulieren','Rapsöl-Spray statt flüssiges Öl – gleichmässiger','Trocken tupfen vor dem Fryer','Wenden nach halber Zeit','Kichererbsen und Tofu: je trockener desto besser','Frischer Knoblauch erst in letzten 3 Min','2-Runden-Methode: 160°C dann 200°C','Backpapier reduziert Luftzirkulation','Metallform = gleichmässige Hitze']},
+{ico:'⚙️',col:'var(--tipps)',title:'TM7 Mastery',items:['Umkehrstufe 1 für alles was ganz bleiben soll','Stufe 5 (5 Sek) = Grob hacken','120°C = Anbraten ohne Spritzen','Pastawasser vor dem Abgiessen aufbewahren','Miso nie über 90°C','Rote Linsen: kein Einweichen – 15 Min / 100°C / Stufe 1','TM7 + Air Fryer gleichzeitig = 15-Min-Gerichte','Suppen: erst Stufe 5, dann 8, dann 10','Varoma für sanftes Dampfgaren','Beide Geräte gleichzeitig spart die meiste Zeit']},
+{ico:'🛒',col:'var(--auf)',title:'Meal Prep & Einkaufen',items:['Immer vorrätig: Dosentomaten, Kichererbsen, Linsen','TK-Gemüse = gleich wie frisch','Kartoffeln vorkochen – ganze Woche Blitz-Kartoffeln','Reis auf Vorrat kochen für Fried Rice','Mikrowellen-Reis rettet 15-Min-Gerichte','Hähnchen einfrieren, über Nacht auftauen','Avocados: 2 reif, 2 hart kaufen','Kräuter in Eiswürfeln mit Olivenöl einfrieren','Saucen halten 1-2 Wochen','Reisnudeln und Kichererbsen immer vorrätig']},
+];
+
+// Merge Wings into CRISPY array
+(function() {
+  if (typeof WINGS === 'undefined' || typeof CRISPY === 'undefined') return;
+  for (var i = 0; i < WINGS.length; i++) {
+    var w = WINGS[i];
+    CRISPY.push({
+      emoji: w.ico, title: w.title, sub: w.sub,
+      kategorie: 'wings', protein: 'huhn',
+      badges: [{cls:'tr', txt: w.heat}, {cls:'tw', txt: w.zeit}],
+      geraet: w.geraet, marinade: w.marinade,
+      zutaten: w.zutaten, schritte: w.schritte, tipp: w.tipp
+    });
+  }
+})();
+
+// Merge extra burger sossen
+(function() {
+  if (typeof BURGER_SOSSEN === 'undefined' || typeof EXTRA_BURGER_SOSSEN === 'undefined') return;
+  for (var i = 0; i < EXTRA_BURGER_SOSSEN.length; i++)
+    BURGER_SOSSEN.push(EXTRA_BURGER_SOSSEN[i]);
+})();
+
+// Mark LDL-friendly blitz recipes
+(function() {
+  if (typeof BLITZ === 'undefined') return;
+  for (var i = 0; i < BLITZ.length; i++) {
+    var r = BLITZ[i];
+    // Mark as LDL-ok if it has a LDL-Top tag OR an ldl info string
+    if (r.ldl && r.ldl.length > 0) r.ldl_ok = true;
+    if (r.tags) for (var j = 0; j < r.tags.length; j++) {
+      var t = r.tags[j];
+      if ((t.t || t.txt || '').indexOf('LDL') >= 0) { r.ldl_ok = true; break; }
     }
   }
+})();
+
+/* ═══════════════════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════════════════ */
+function show(page, btn) {
+  var pages = document.querySelectorAll('.page');
+  for (var i = 0; i < pages.length; i++) pages[i].classList.remove('active');
+  var navBtns = document.querySelectorAll('.nav-btn');
+  for (var i = 0; i < navBtns.length; i++) navBtns[i].classList.remove('on');
+  var pg = document.getElementById('page-' + page);
+  if (pg) pg.classList.add('active');
+  var nb = btn || document.querySelector('.nav-btn[data-p="' + page + '"]');
+  if (nb) nb.classList.add('on');
   window.scrollTo(0, 0);
 }
 
-/* ═══════════════════════════════════════════
-   CARD TOGGLE
-═══════════════════════════════════════════ */
-function toggleCard(card) { card.classList.toggle('on'); }
+/* ═══════════════════════════════════════════════════════
+   TOGGLE CARDS
+═══════════════════════════════════════════════════════ */
+function tog(card) { card.classList.toggle('open'); }
 
-/* ═══════════════════════════════════════════
-   PORTION SELECTOR
-═══════════════════════════════════════════ */
-function changePortion(btn, delta) {
+/* ═══════════════════════════════════════════════════════
+   PORTIONS
+═══════════════════════════════════════════════════════ */
+function chgPor(btn, delta) {
   var bar = btn.parentElement;
-  var cur = parseInt(bar.getAttribute('data-cur'), 10);
-  var base = parseInt(bar.getAttribute('data-base'), 10);
+  var cur = parseInt(bar.getAttribute('data-cur')) || 2;
+  var base = parseInt(bar.getAttribute('data-base')) || 2;
   cur = Math.max(1, Math.min(20, cur + delta));
   bar.setAttribute('data-cur', cur);
-  bar.querySelector('.portion-val').textContent = cur;
+  bar.querySelector('.por-val').textContent = cur;
   var ratio = cur / base;
-  var node = bar;
-  while (node && !node.classList.contains('card') && !node.classList.contains('pan-card')) node = node.parentElement;
-  if (!node) return;
-  var tds = node.querySelectorAll('td.qty');
+  var card = bar;
+  while (card && !card.classList.contains('card')) card = card.parentElement;
+  if (!card) return;
+  var tds = card.querySelectorAll('td.amt');
   for (var i = 0; i < tds.length; i++) {
     var td = tds[i];
-    var orig = td.getAttribute('data-orig');
-    if (!orig) { td.setAttribute('data-orig', td.textContent); orig = td.textContent; }
+    var orig = td.getAttribute('data-orig') || td.textContent;
+    td.setAttribute('data-orig', orig);
     var m = orig.match(/^([0-9.,]+)\s*(.*)$/);
     if (m) {
-      var num = parseFloat(m[1].replace(',', '.'));
-      if (!isNaN(num)) {
-        var nv = Math.round(num * ratio * 10) / 10;
-        td.textContent = (Number.isInteger(nv) ? nv.toString() : nv.toFixed(1)) + (m[2] ? ' ' + m[2] : '');
+      var n = parseFloat(m[1].replace(',', '.'));
+      if (!isNaN(n)) {
+        var nv = Math.round(n * ratio * 10) / 10;
+        td.textContent = (nv === Math.floor(nv) ? nv : nv.toFixed(1)) + (m[2] ? ' ' + m[2] : '');
         continue;
       }
     }
@@ -4694,205 +4631,198 @@ function changePortion(btn, delta) {
   }
 }
 
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════
    HTML BUILDERS
-═══════════════════════════════════════════ */
+═══════════════════════════════════════════════════════ */
 function mkTable(rows) {
   if (!rows || !rows.length) return '';
-  var html = '';
-  for (var i = 0; i < rows.length; i++) {
-    html += '<tr><td>' + (rows[i][0] || '') + '</td><td class="qty">' + (rows[i][1] || '') + '</td></tr>';
-  }
-  return html;
+  var h = '';
+  for (var i = 0; i < rows.length; i++)
+    h += '<tr><td>' + (rows[i][0]||'') + '</td><td class="amt">' + (rows[i][1]||'') + '</td></tr>';
+  return h;
 }
-
 function mkSteps(steps) {
   if (!steps || !steps.length) return '';
-  var html = '';
-  for (var i = 0; i < steps.length; i++) { html += '<li>' + (steps[i] || '') + '</li>'; }
-  return html;
+  var h = '';
+  for (var i = 0; i < steps.length; i++) h += '<li>' + steps[i] + '</li>';
+  return h;
 }
-
 function mkTags(tags) {
   if (!tags || !tags.length) return '';
-  var html = '';
+  var h = '';
   for (var i = 0; i < tags.length; i++) {
     var t = tags[i];
-    if (typeof t === 'string') html += '<span class="tag tw">' + t + '</span>';
-    else html += '<span class="tag ' + (t.c || t.cls || 'tw') + '">' + (t.t || t.txt || '') + '</span>';
+    if (typeof t === 'string') h += '<span class="tag tw">' + t + '</span>';
+    else h += '<span class="tag ' + (t.c||t.cls||'tw') + '">' + (t.t||t.txt||'') + '</span>';
   }
-  return html;
+  return h;
 }
-
-function mkPortionBar(base) {
-  return '<div class="portion" data-base="' + base + '" data-cur="' + base + '">'
-    + '<span class="portion-lbl">Portionen</span>'
-    + '<button class="portion-btn" onclick="changePortion(this,-1)">−</button>'
-    + '<span class="portion-val">' + base + '</span>'
-    + '<button class="portion-btn" onclick="changePortion(this,+1)">+</button>'
+function mkPor(base) {
+  return '<div class="portions" data-base="' + base + '" data-cur="' + base + '">'
+    + '<span class="por-lbl">🍽️ Portionen</span>'
+    + '<button class="por-btn" onclick="chgPor(this,-1)">−</button>'
+    + '<span class="por-val">' + base + '</span>'
+    + '<button class="por-btn" onclick="chgPor(this,+1)">+</button>'
     + '</div>';
 }
-
-function mkCard(ico, title, sub, tags, body, extraClass) {
+function mkCard(ico, title, sub, tags, body, extraCls) {
   var el = document.createElement('div');
-  el.className = 'card' + (extraClass ? ' ' + extraClass : '');
-  el.innerHTML = '<div class="chd">'
-    + '<div class="cico">' + ico + '</div>'
-    + '<div class="cinf"><div class="ctitle">' + title + '</div>'
-    + '<div class="csub">' + sub + '</div>'
-    + '<div class="ctags">' + tags + '</div></div>'
-    + '<span class="chev">▾</span></div>'
-    + '<div class="cbd"><div class="cin">' + body + '</div></div>';
-  (function(card){ card.querySelector('.chd').addEventListener('click', function(){ toggleCard(card); }); })(el);
+  el.className = 'card' + (extraCls ? ' ' + extraCls : '');
+  el.innerHTML =
+    '<div class="card-hd">'
+    + '<div class="card-ico">' + ico + '</div>'
+    + '<div class="card-inf">'
+    + '<div class="card-title">' + title + '</div>'
+    + '<div class="card-sub">' + sub + '</div>'
+    + '<div class="card-tags">' + tags + '</div>'
+    + '</div><span class="card-chev">▾</span></div>'
+    + '<div class="card-bd"><div class="card-in">' + body + '</div></div>';
+  (function(c){ c.querySelector('.card-hd').addEventListener('click', function(){ tog(c); }); })(el);
   return el;
 }
-
-function setActiveFilter(barId, btn) {
+function grpHead(label) {
+  var d = document.createElement('div');
+  d.style.cssText = 'font-size:.55rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);padding:14px 14px 8px;display:flex;align-items:center;gap:10px;max-width:720px;margin:0 auto';
+  d.innerHTML = label + '<span style="flex:1;height:1px;background:var(--bdr)"></span>';
+  return d;
+}
+function mkSauceCard(s, section) {
+  var sc = document.createElement('div');
+  sc.className = 'sc';
+  var rows = mkTable(s.zutaten || s.zut || []);
+  var heat = s.heat ? '<div class="sc-heat">Schärfe ' + s.heat + '/10</div>' : '';
+  sc.innerHTML =
+    '<div class="sc-hd">'
+    + '<div class="sc-em">' + (s.e||s.emoji||'🫙') + '</div>'
+    + '<div class="sc-inf"><div class="sc-t">' + (s.t||s.title||'') + '</div>'
+    + '<div class="sc-s">' + (s.s||s.sub||'') + '</div>' + heat + '</div>'
+    + '<span class="sc-chev">▾</span></div>'
+    + '<div class="sc-bd"><div class="sc-in">'
+    + '<div class="lbl">Zutaten</div><table>' + rows + '</table>'
+    + '<div class="lbl">Zubereitung</div><p>' + (s.rezept||s.r||'') + '</p>'
+    + '<div class="tip">💡 ' + (s.tipp||s.tip||'') + '</div>'
+    + '</div></div>';
+  (function(c){ c.querySelector('.sc-hd').addEventListener('click', function(){ c.classList.toggle('open'); }); })(sc);
+  return sc;
+}
+function setFbtn(barId, btn) {
   var bar = document.getElementById(barId);
   if (!bar) return;
-  var btns = bar.querySelectorAll('.fb');
-  for (var i = 0; i < btns.length; i++) btns[i].classList.remove('on');
+  var bs = bar.querySelectorAll('.fbtn');
+  for (var i = 0; i < bs.length; i++) bs[i].classList.remove('on');
   btn.classList.add('on');
 }
-
-function updateCount(countId, vis, total) {
-  var el = document.getElementById(countId);
-  if (!el) return;
-  el.innerHTML = vis < total ? '<b>' + vis + '</b> von ' + total + ' Rezepten' : '';
+function updCount(id, vis, total) {
+  var el = document.getElementById(id);
+  if (el) el.innerHTML = vis < total ? '<b>' + vis + '</b> von ' + total + ' Rezepten' : '';
 }
 
-/* ═══════════════════════════════════════════
-   BLITZ
-═══════════════════════════════════════════ */
-var BST = {kat:'alle', kueche:'alle', geraet:'alle', ldl:'alle'};
-
-function blitzFilter(dim, val, btn) {
+/* ═══════════════════════════════════════════════════════
+   BLITZ SECTION
+═══════════════════════════════════════════════════════ */
+var BST = {kat:'alle', geraet:'alle', ldl:'alle'};
+function bf(dim, val, btn) {
   BST[dim] = val;
-  setActiveFilter('bf-' + dim, btn);
+  setFbtn('bf-' + dim, btn);
   applyBlitz();
 }
-
 function applyBlitz() {
   var vis = 0;
   var cards = document.querySelectorAll('#blitz-grid .card');
   for (var i = 0; i < cards.length; i++) {
-    var r = D_BLITZ[parseInt(cards[i].getAttribute('data-i'), 10)];
+    var r = BLITZ[parseInt(cards[i].getAttribute('data-i'))];
+    if (!r) continue;
     var ok = (BST.kat === 'alle' || r.kat === BST.kat)
-          && (BST.kueche === 'alle' || r.kueche === BST.kueche)
           && (BST.geraet === 'alle' || r.geraet === BST.geraet || r.geraet === 'both')
-          && (BST.ldl === 'alle' || !!r.ldl);
+          && (BST.ldl === 'alle' || r.ldl_ok === true);
     cards[i].style.display = ok ? '' : 'none';
     if (ok) vis++;
   }
-  document.getElementById('blitz-empty').style.display = vis === 0 ? '' : 'none';
-  updateCount('blitz-count', vis, D_BLITZ.length);
+  var em = document.getElementById('blitz-empty');
+  if (em) em.style.display = vis === 0 ? '' : 'none';
+  updCount('blitz-count', vis, BLITZ.length);
 }
-
 function renderBlitz() {
   var g = document.getElementById('blitz-grid');
-  for (var i = 0; i < D_BLITZ.length; i++) {
-    var r = D_BLITZ[i];
+  for (var i = 0; i < BLITZ.length; i++) {
+    var r = BLITZ[i];
     var tags = mkTags(r.tags || []);
-    var devL = r.geraet === 'af' ? 'Air Fryer' : r.geraet === 'tm' ? 'TM7' : 'AF + TM7';
-    var mkH = '';
-    if (r.makros) {
-      mkH = '<div class="mkrow">'
-        + '<span class="mk mk-p">Protein: ' + r.makros.p + '</span>'
-        + '<span class="mk mk-k">KH: ' + r.makros.kh + '</span>'
-        + '<span class="mk mk-f">Fett: ' + r.makros.f + '</span>'
-        + '</div>';
-    }
-    var ldlH = r.ldl ? '<div class="hbox"><b>LDL-Info:</b> ' + r.ldl + '</div>' : '';
-    var body = mkPortionBar(2)
-      + '<span class="dbadge">' + devL + '</span>'
-      + ' <span class="dbadge">' + (r.zeit || '') + ' Min</span>'
+    var devL = r.geraet === 'af' ? '🌬️ AF' : r.geraet === 'tm' ? '⚙️ TM7' : '🔀 Beide';
+    var mkH = r.makros ? '<div class="mkrow"><span class="mk mk-p">🥩 '+r.makros.p+'</span><span class="mk mk-k">🌾 '+r.makros.kh+'</span><span class="mk mk-f">🫒 '+r.makros.f+'</span></div>' : '';
+    var ldlH = r.ldl ? '<div class="ldl-box"><b>💚 LDL-Info:</b> ' + r.ldl + '</div>' : '';
+    var body = mkPor(2)
+      + '<span class="dev-badge">' + devL + '</span>'
+      + (r.zeit ? '<span class="dev-badge">⚡ ' + r.zeit + ' Min</span>' : '')
       + mkH
-      + '<div class="lbl">Zutaten</div><table>' + mkTable(r.zut || []) + '</table>'
-      + '<div class="lbl">Zubereitung</div><ol>' + mkSteps(r.steps || []) + '</ol>'
-      + '<div class="tip">Tipp: ' + (r.tipp || '') + '</div>'
+      + '<div class="lbl">Zutaten</div><table>' + mkTable(r.zut||[]) + '</table>'
+      + '<div class="lbl">Zubereitung</div><ol>' + mkSteps(r.steps||[]) + '</ol>'
+      + '<div class="tip">💡 ' + (r.tipp||'') + '</div>'
       + ldlH;
-    var card = mkCard(r.ico, r.title, r.sub, tags, body, '');
+    var card = mkCard(r.ico, r.title, r.sub, tags, body, r.ldl_ok ? 'ldl-card' : '');
     card.setAttribute('data-i', i);
     g.appendChild(card);
   }
-  document.getElementById('blitz-empty').style.display = 'none';
 }
-
 function renderBlitzTipps() {
   var w = document.getElementById('blitz-tipps');
-  if (!w || !D_TIPPS) return;
-  for (var i = 0; i < D_TIPPS.length; i++) {
-    var t = D_TIPPS[i];
+  if (!w || !BLITZ_TIPPS) return;
+  for (var i = 0; i < BLITZ_TIPPS.length; i++) {
+    var t = BLITZ_TIPPS[i];
     var items = '';
-    for (var j = 0; j < t.items.length; j++) {
+    for (var j = 0; j < t.items.length; j++)
       items += '<div class="tip-item"><span class="tip-num" style="color:' + t.col + '">' + (j+1) + '</span><span>' + t.items[j] + '</span></div>';
-    }
     var box = document.createElement('div');
-    box.className = 'tipbox';
-    box.innerHTML = '<div class="tipbox-hd"><span class="ico">' + t.ico + '</span>'
-      + '<span class="ttl" style="color:' + t.col + '">' + t.title + '</span>'
-      + '<span class="tipbox-chev">▾</span></div>'
-      + '<div class="tipbox-bd">' + items + '</div>';
-    (function(b){ b.querySelector('.tipbox-hd').addEventListener('click', function(){ b.classList.toggle('on'); }); })(box);
+    box.className = 'tip-box';
+    box.innerHTML = '<div class="tip-box-hd"><span class="tbi">' + t.ico + '</span><span class="tbt" style="color:' + t.col + '">' + t.title + '</span><span class="tip-box-chev">▾</span></div><div class="tip-box-bd">' + items + '</div>';
+    (function(b){ b.querySelector('.tip-box-hd').addEventListener('click', function(){ b.classList.toggle('open'); }); })(box);
     w.appendChild(box);
   }
 }
 
-/* ═══════════════════════════════════════════
-   BURGER
-═══════════════════════════════════════════ */
-var BUST = {prot:'alle', style:'alle', ldl:'alle'};
+/* ═══════════════════════════════════════════════════════
+   BURGER SECTION
+═══════════════════════════════════════════════════════ */
+var BUST = {prot:'alle', style:'alle'};
 var BTAB = 'burger';
-
-function burgerTab(tab, btn) {
+function bTab(tab, btn) {
   BTAB = tab;
-  var stabs = document.querySelectorAll('.stab');
+  var stabs = document.querySelectorAll('#page-burger .stab');
   for (var i = 0; i < stabs.length; i++) stabs[i].classList.remove('on');
   btn.classList.add('on');
-  var bg = document.getElementById('burger-grid');
-  var pg = document.getElementById('paniert-grid');
-  var ss = document.getElementById('sossen-section');
-  var bf = document.getElementById('burger-filters');
-  var bc = document.getElementById('burger-count');
-  var be = document.getElementById('burger-empty');
-  bg.style.display = tab === 'burger' ? 'flex' : 'none';
-  pg.style.display = tab === 'paniert' ? 'flex' : 'none';
-  ss.style.display = tab === 'sossen' ? 'block' : 'none';
-  if (bf) bf.style.display = tab === 'burger' ? '' : 'none';
-  if (bc) bc.style.display = tab === 'burger' ? '' : 'none';
-  if (be) be.style.display = 'none';
+  document.getElementById('burger-grid').style.display    = tab === 'burger'  ? '' : 'none';
+  document.getElementById('paniert-grid').style.display   = tab === 'paniert' ? '' : 'none';
+  document.getElementById('sossen-section').style.display = tab === 'sossen'  ? '' : 'none';
+  document.getElementById('burger-filters').style.display = tab === 'burger'  ? '' : 'none';
+  document.getElementById('burger-count').style.display   = tab === 'burger'  ? '' : 'none';
+  document.getElementById('burger-empty').style.display   = 'none';
   if (tab === 'burger') applyBurger();
 }
-
-function burgerFilter(dim, val, btn) {
+function bbf(dim, val, btn) {
   BUST[dim] = val;
-  setActiveFilter('bf-' + dim, btn);
+  setFbtn('bbf-' + dim, btn);
   applyBurger();
 }
-
 function applyBurger() {
   var vis = 0;
   var cards = document.querySelectorAll('#burger-grid .card');
   for (var i = 0; i < cards.length; i++) {
-    var b = BURGER[parseInt(cards[i].getAttribute('data-i'), 10)];
-    var isLdl = b.style === 'healthy' || (b.cls && b.cls.indexOf('healthy') >= 0);
+    var b = BURGER[parseInt(cards[i].getAttribute('data-i'))];
+    if (!b) continue;
     var ok = (BUST.prot === 'alle' || b.protein === BUST.prot)
-          && (BUST.style === 'alle' || b.style === BUST.style)
-          && (BUST.ldl === 'alle' || isLdl);
+          && (BUST.style === 'alle' || b.style === BUST.style);
     cards[i].style.display = ok ? '' : 'none';
     if (ok) vis++;
   }
-  document.getElementById('burger-empty').style.display = vis === 0 ? '' : 'none';
-  updateCount('burger-count', vis, BURGER.length);
+  var em = document.getElementById('burger-empty');
+  if (em) em.style.display = vis === 0 ? '' : 'none';
+  updCount('burger-count', vis, BURGER.length);
 }
-
 function renderBurger() {
   var g = document.getElementById('burger-grid');
   for (var i = 0; i < BURGER.length; i++) {
     var b = BURGER[i];
     var tags = mkTags(b.tags || []);
-    var pattyH = '';
-    if (b.patty) pattyH = '<div class="ibox"><div class="lbl">' + b.patty.label + '</div><table>' + mkTable(b.patty.items) + '</table></div>';
+    var pattyH = b.patty ? '<div class="ibox"><div class="lbl">' + b.patty.label + '</div><table>' + mkTable(b.patty.items) + '</table></div>' : '';
     var aufH = '';
     if (b.aufbau && b.aufbau.length) {
       var layers = '';
@@ -4900,384 +4830,266 @@ function renderBurger() {
         var l = b.aufbau[j];
         layers += '<div class="alayer"><span class="al-e">' + l.e + '</span><span class="al-n">' + l.n + '</span>' + (l.nt ? '<span class="al-t">' + l.nt + '</span>' : '') + '</div>';
       }
-      aufH = '<div class="lbl">Aufbau</div><div class="aufbau">' + layers + '</div>';
+      aufH = '<div class="lbl">🍔 Aufbau</div><div class="aufbau">' + layers + '</div>';
     }
-    var body = mkPortionBar(2) + pattyH + aufH
-      + '<div class="lbl">Zutaten</div><table>' + mkTable(b.zut || []) + '</table>'
-      + '<div class="lbl">Zubereitung</div><ol>' + mkSteps(b.steps || []) + '</ol>'
-      + '<div class="tip">Tipp: ' + (b.tipp || '') + '</div>';
-    var card = mkCard(b.icon, b.title, b.sub, tags, body, b.cls || '');
+    var body = mkPor(2) + pattyH + aufH
+      + '<div class="lbl">Zutaten</div><table>' + mkTable(b.zut||[]) + '</table>'
+      + '<div class="lbl">Zubereitung</div><ol>' + mkSteps(b.steps||[]) + '</ol>'
+      + '<div class="tip">💡 ' + (b.tipp||'') + '</div>';
+    var card = mkCard(b.icon, b.title, b.sub, tags, body, b.cls||'');
     card.setAttribute('data-i', i);
     g.appendChild(card);
   }
 }
-
 function renderPaniert() {
   var g = document.getElementById('paniert-grid');
   for (var i = 0; i < PANIERT.length; i++) {
     var p = PANIERT[i];
     var tags = mkTags(p.tags || []);
     var pattyH = p.patty ? '<div class="ibox"><div class="lbl">' + p.patty.label + '</div><table>' + mkTable(p.patty.items) + '</table></div>' : '';
-    var body = mkPortionBar(2) + pattyH
-      + '<div class="lbl">Panade & Zutaten</div><table>' + mkTable(p.zut || []) + '</table>'
-      + '<div class="lbl">Zubereitung</div><ol>' + mkSteps(p.steps || []) + '</ol>'
-      + '<div class="tip">Tipp: ' + (p.tipp || '') + '</div>';
+    var body = mkPor(2) + pattyH
+      + '<div class="lbl">Panade & Zutaten</div><table>' + mkTable(p.zut||[]) + '</table>'
+      + '<div class="lbl">Zubereitung</div><ol>' + mkSteps(p.steps||[]) + '</ol>'
+      + '<div class="tip">💡 ' + (p.tipp||'') + '</div>';
     var card = mkCard(p.icon, p.title, p.sub, tags, body, '');
     card.setAttribute('data-i', i);
     g.appendChild(card);
   }
 }
-
 function renderBurgerSossen() {
-  var w = document.getElementById('sossen-wrap');
-  for (var gi = 0; gi < D_BSOSS.length; gi++) {
-    var grp = D_BSOSS[gi];
-    var lbl = document.createElement('div');
-    lbl.style.cssText = 'font-size:.6rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:14px 14px 8px;display:flex;align-items:center;gap:10px;max-width:720px;margin:0 auto';
-    lbl.innerHTML = grp.gruppe + '<span style="flex:1;height:1px;background:var(--bdr);display:block"></span>';
-    w.appendChild(lbl);
+  var w = document.getElementById('burger-sossen-wrap');
+  for (var gi = 0; gi < BURGER_SOSSEN.length; gi++) {
+    var grp = BURGER_SOSSEN[gi];
+    w.appendChild(grpHead(grp.gruppe));
     var grid = document.createElement('div');
     grid.className = 'sgrid';
-    for (var si = 0; si < grp.items.length; si++) {
-      var s = grp.items[si];
-      var sc = document.createElement('div');
-      sc.className = 'sc';
-      sc.innerHTML = '<div class="sc-hd"><div class="sc-em">' + (s.e || '') + '</div>'
-        + '<div class="sc-inf"><div class="sc-t">' + (s.t || '') + '</div>'
-        + '<div class="sc-s">' + (s.s || '') + '</div>'
-        + (s.heat ? '<div class="sc-heat">Schärfe ' + s.heat + '/10</div>' : '')
-        + '</div><span class="sc-chev">▾</span></div>'
-        + '<div class="sc-bd"><div class="sc-in">'
-        + '<div class="lbl">Zutaten</div><table>' + mkTable(s.zutaten || []) + '</table>'
-        + '<div class="lbl">Zubereitung</div><p>' + (s.rezept || '') + '</p>'
-        + '<div class="tip">Tipp: ' + (s.tipp || '') + '</div>'
-        + '</div></div>';
-      (function(card){ card.querySelector('.sc-hd').addEventListener('click', function(){ card.classList.toggle('on'); }); })(sc);
-      grid.appendChild(sc);
-    }
+    for (var si = 0; si < grp.items.length; si++)
+      grid.appendChild(mkSauceCard(grp.items[si], 'burger'));
     w.appendChild(grid);
   }
 }
 
-/* ═══════════════════════════════════════════
-   CRISPY
-═══════════════════════════════════════════ */
-var CST = {kat:'alle', geraet:'alle', ldl:'alle'};
-
-
-function crispyTab(tab, btn) {
-  var stabs = document.querySelectorAll('#crispy-subtabs .stab');
+/* ═══════════════════════════════════════════════════════
+   CRISPY SECTION
+═══════════════════════════════════════════════════════ */
+var CST = {kat:'alle', geraet:'alle'};
+function cTab(tab, btn) {
+  var stabs = document.querySelectorAll('#page-crispy .stab');
   for (var i = 0; i < stabs.length; i++) stabs[i].classList.remove('on');
   btn.classList.add('on');
   document.getElementById('ct-rezepte').style.display = tab === 'rezepte' ? '' : 'none';
   document.getElementById('ct-sossen').style.display  = tab === 'sossen'  ? '' : 'none';
   document.getElementById('ct-panaden').style.display = tab === 'panaden' ? '' : 'none';
 }
-
-function crispyFilter(dim, val, btn) {
+function cf(dim, val, btn) {
   CST[dim] = val;
-  setActiveFilter('cf-' + dim, btn);
+  setFbtn('cf-' + dim, btn);
   applyCrispy();
 }
-
 function applyCrispy() {
   var vis = 0;
-  var total = D_CRISPY.length;
   var cards = document.querySelectorAll('#crispy-grid .card');
   for (var i = 0; i < cards.length; i++) {
-    var idx = parseInt(cards[i].getAttribute('data-i'), 10);
-    var r = idx < D_CRISPY.length ? D_CRISPY[idx] : null;
-    if (!r) { cards[i].style.display = 'none'; continue; }
+    var r = CRISPY[parseInt(cards[i].getAttribute('data-i'))];
+    if (!r) continue;
     var gok = CST.geraet === 'alle' || (r.geraet && r.geraet.indexOf(CST.geraet) >= 0);
     var kok = CST.kat === 'alle' || r.kategorie === CST.kat;
-    var lok = CST.ldl === 'alle' || r.kategorie === 'healthy' || !!r.ldl;
-    cards[i].style.display = (gok && kok && lok) ? '' : 'none';
-    if (gok && kok && lok) vis++;
+    cards[i].style.display = (gok && kok) ? '' : 'none';
+    if (gok && kok) vis++;
   }
-  document.getElementById('crispy-empty').style.display = vis === 0 ? '' : 'none';
-  updateCount('crispy-count', vis, total);
+  var em = document.getElementById('crispy-empty');
+  if (em) em.style.display = vis === 0 ? '' : 'none';
+  updCount('crispy-count', vis, CRISPY.length);
 }
-
 function renderCrispy() {
   var g = document.getElementById('crispy-grid');
-  for (var i = 0; i < D_CRISPY.length; i++) {
-    var r = D_CRISPY[i];
+  for (var i = 0; i < CRISPY.length; i++) {
+    var r = CRISPY[i];
     var tags = mkTags(r.badges || []);
     var devH = '';
-    if (r.geraet) for (var j = 0; j < r.geraet.length; j++) devH += '<span class="dbadge">' + r.geraet[j] + '</span> ';
-    var marH = '';
-    if (r.marinade) marH = '<div class="ibox"><div class="lbl">' + r.marinade.label + '</div><table>' + mkTable(r.marinade.zutaten) + '</table></div>';
-    var body = mkPortionBar(2) + devH + marH
-      + '<div class="lbl">Zutaten</div><table>' + mkTable(r.zutaten || []) + '</table>'
-      + '<div class="lbl">Zubereitung</div><ol>' + mkSteps(r.schritte || []) + '</ol>'
-      + '<div class="tip">Tipp: ' + (r.tipp || '') + '</div>';
-    var card = mkCard(r.emoji, r.title, r.sub, tags, body, r.kategorie === 'healthy' ? 'healthy' : '');
+    if (r.geraet) for (var j=0; j<r.geraet.length; j++) devH += '<span class="dev-badge">' + r.geraet[j] + '</span> ';
+    var marH = r.marinade ? '<div class="ibox"><div class="lbl">' + r.marinade.label + '</div><table>' + mkTable(r.marinade.zutaten) + '</table></div>' : '';
+    var body = mkPor(2) + devH + marH
+      + '<div class="lbl">Zutaten</div><table>' + mkTable(r.zutaten||[]) + '</table>'
+      + '<div class="lbl">Zubereitung</div><ol>' + mkSteps(r.schritte||[]) + '</ol>'
+      + '<div class="tip">💡 ' + (r.tipp||'') + '</div>';
+    var card = mkCard(r.emoji, r.title, r.sub, tags, body, r.kategorie === 'healthy' ? 'ldl-card' : '');
     card.setAttribute('data-i', i);
     g.appendChild(card);
   }
 }
-
 function renderCrispySossen() {
   var w = document.getElementById('crispy-sossen-wrap');
-  for (var gi = 0; gi < D_CSOSS.length; gi++) {
-    var grp = D_CSOSS[gi];
-    var lbl = document.createElement('div');
-    lbl.style.cssText = 'font-size:.6rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:0 14px 8px;display:flex;align-items:center;gap:10px;max-width:720px;margin:0 auto';
-    lbl.innerHTML = grp.gruppe + '<span style="flex:1;height:1px;background:var(--bdr);display:block"></span>';
-    w.appendChild(lbl);
+  for (var gi = 0; gi < CRISPY_SOSSEN.length; gi++) {
+    var grp = CRISPY_SOSSEN[gi];
+    w.appendChild(grpHead(grp.gruppe));
     var grid = document.createElement('div');
     grid.className = 'sgrid';
     for (var si = 0; si < grp.items.length; si++) {
       var s = grp.items[si];
       var sc = document.createElement('div');
       sc.className = 'sc';
-      sc.innerHTML = '<div class="sc-hd"><div class="sc-em">' + (s.emoji || '') + '</div>'
-        + '<div class="sc-inf"><div class="sc-t">' + (s.title || '') + '</div>'
-        + '<div class="sc-s">' + (s.heat || '') + '</div></div>'
+      sc.innerHTML = '<div class="sc-hd"><div class="sc-em">' + (s.emoji||'🫙') + '</div>'
+        + '<div class="sc-inf"><div class="sc-t">' + (s.title||'') + '</div>'
+        + '<div class="sc-s">' + (s.heat||'') + '</div></div>'
         + '<span class="sc-chev">▾</span></div>'
         + '<div class="sc-bd"><div class="sc-in">'
-        + '<div class="lbl">Zutaten</div><table>' + mkTable(s.zutaten || []) + '</table>'
-        + '<div class="lbl">Zubereitung</div><p>' + (s.rezept || '') + '</p>'
-        + '<div class="tip">Tipp: ' + (s.tipp || '') + '</div></div></div>';
-      (function(card){ card.querySelector('.sc-hd').addEventListener('click', function(){ card.classList.toggle('on'); }); })(sc);
+        + '<div class="lbl">Zutaten</div><table>' + mkTable(s.zutaten||[]) + '</table>'
+        + '<div class="lbl">Zubereitung</div><p>' + (s.rezept||'') + '</p>'
+        + '<div class="tip">💡 ' + (s.tipp||'') + '</div></div></div>';
+      (function(c){ c.querySelector('.sc-hd').addEventListener('click', function(){ c.classList.toggle('open'); }); })(sc);
       grid.appendChild(sc);
     }
     w.appendChild(grid);
   }
 }
-
 function renderPanaden() {
   var w = document.getElementById('panaden-wrap');
-  for (var i = 0; i < D_PANADEN.length; i++) {
-    var p = D_PANADEN[i];
+  for (var i = 0; i < PANADEN.length; i++) {
+    var p = PANADEN[i];
     var el = document.createElement('div');
     el.className = 'pan-card';
     var ico = p.t.split(' ')[0];
-    var titleText = p.t.replace(/^\S+\s/, '');
-    el.innerHTML = '<div class="pan-card-hd"><div class="cico">' + ico + '</div>'
-      + '<div class="cinf"><div class="ctitle">' + titleText + '</div>'
-      + '<div class="csub">' + p.z + '</div>'
-      + '<div class="ctags"><span class="tag tr">Panade</span></div></div>'
-      + '<span class="chev">▾</span></div>'
-      + '<div class="cbd"><div class="cin">'
+    var tit = p.t.replace(/^\S+\s/,'');
+    el.innerHTML = '<div class="pan-card-hd card-hd">'
+      + '<div class="card-ico">' + ico + '</div>'
+      + '<div class="card-inf"><div class="card-title">' + tit + '</div>'
+      + '<div class="card-sub">' + p.z + '</div></div>'
+      + '<span class="card-chev">▾</span></div>'
+      + '<div class="card-bd"><div class="card-in">'
       + '<div class="pan-basis">' + p.b + '</div>'
       + '<div class="lbl">Marinade</div><table>' + mkTable(p.marinade) + '</table>'
       + '<div class="lbl">Panade</div><table>' + mkTable(p.panade) + '</table>'
-      + '<div class="lbl">Methode</div><p style="font-size:.78rem;color:var(--muted);line-height:1.6;padding:4px 0 8px">' + p.methode + '</p>'
-      + '<div class="tip">Tipp: ' + p.tipp + '</div>'
+      + '<div class="lbl">Methode</div><p style="font-size:.76rem;color:var(--muted);line-height:1.6;padding:4px 0 8px">' + p.methode + '</p>'
+      + '<div class="tip">💡 ' + p.tipp + '</div>'
       + '</div></div>';
-    (function(c){ c.querySelector('.pan-card-hd').addEventListener('click', function(){ c.classList.toggle('on'); }); })(el);
+    (function(c){ c.querySelector('.pan-card-hd').addEventListener('click', function(){ c.classList.toggle('open'); }); })(el);
     w.appendChild(el);
   }
 }
 
-/* ═══════════════════════════════════════════
-   CURRY
-═══════════════════════════════════════════ */
-var KST = {kat:'alle', prot:'alle', heat:'alle', ldl:'alle'};
-
-function curryFilter(dim, val, btn) {
+/* ═══════════════════════════════════════════════════════
+   CURRY SECTION
+═══════════════════════════════════════════════════════ */
+var KST = {kat:'alle', prot:'alle', heat:'alle'};
+function kf(dim, val, btn) {
   KST[dim] = val;
-  setActiveFilter('kf-' + dim, btn);
+  setFbtn('kf-' + dim, btn);
   applyCurry();
 }
-
 function applyCurry() {
   var vis = 0;
   var cards = document.querySelectorAll('#curry-grid .card');
   for (var i = 0; i < cards.length; i++) {
-    var r = D_CURRY[parseInt(cards[i].getAttribute('data-i'), 10)];
-    var isLdl = r.kategorie === 'healthy' || r.protein === 'vegan' || r.protein === 'vegetarisch';
+    var r = CURRY[parseInt(cards[i].getAttribute('data-i'))];
+    if (!r) continue;
     var ok = (KST.kat === 'alle' || r.kategorie === KST.kat)
           && (KST.prot === 'alle' || r.protein === KST.prot)
-          && (KST.heat === 'alle' || r.heat === KST.heat)
-          && (KST.ldl === 'alle' || isLdl);
+          && (KST.heat === 'alle' || r.heat === KST.heat);
     cards[i].style.display = ok ? '' : 'none';
     if (ok) vis++;
   }
-  document.getElementById('curry-empty').style.display = vis === 0 ? '' : 'none';
-  updateCount('curry-count', vis, D_CURRY.length);
+  var em = document.getElementById('curry-empty');
+  if (em) em.style.display = vis === 0 ? '' : 'none';
+  updCount('curry-count', vis, CURRY.length);
 }
-
 function renderCurry() {
   var g = document.getElementById('curry-grid');
-  for (var i = 0; i < D_CURRY.length; i++) {
-    var r = D_CURRY[i];
+  for (var i = 0; i < CURRY.length; i++) {
+    var r = CURRY[i];
     var tags = mkTags(r.badges || []);
-    var gewH = '';
-    if (r.gewuerze) gewH = '<div class="ibox"><div class="lbl">' + r.gewuerze.label + '</div><table>' + mkTable(r.gewuerze.items) + '</table></div>';
-    var body = mkPortionBar(4) + gewH
-      + '<div class="lbl">Zutaten</div><table>' + mkTable(r.zutaten || []) + '</table>'
-      + '<div class="lbl">Zubereitung</div><ol>' + mkSteps(r.schritte || []) + '</ol>'
-      + '<div class="tip">Tipp: ' + (r.tipp || '') + '</div>';
-    var card = mkCard(r.emoji, r.title, r.sub, tags, body, r.kategorie === 'healthy' ? 'healthy' : '');
+    var gewH = r.gewuerze ? '<div class="ibox"><div class="lbl">' + r.gewuerze.label + '</div><table>' + mkTable(r.gewuerze.items) + '</table></div>' : '';
+    var body = mkPor(4) + gewH
+      + '<div class="lbl">Zutaten</div><table>' + mkTable(r.zutaten||[]) + '</table>'
+      + '<div class="lbl">Zubereitung</div><ol>' + mkSteps(r.schritte||[]) + '</ol>'
+      + '<div class="tip">💡 ' + (r.tipp||'') + '</div>';
+    var card = mkCard(r.emoji, r.title, r.sub, tags, body, r.kategorie === 'healthy' ? 'ldl-card' : '');
     card.setAttribute('data-i', i);
     g.appendChild(card);
   }
 }
 
-/* ═══════════════════════════════════════════
-   AUFSTRICHE
-═══════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════
+   AUFSTRICHE SECTION
+═══════════════════════════════════════════════════════ */
 var ATAG = 'alle';
-var ATAG_LABELS = {quick:'Schnell', vegan:'Vegan', protein:'Protein', herz:'Herzgesund'};
-var ATAG_CLS = {quick:'tr', vegan:'tg', protein:'tl', herz:'tk'};
-
-function aufFilter(tag, btn) {
+var ATAG_L = {quick:'⚡ Schnell', vegan:'🌱 Vegan', protein:'💪 Protein', herz:'❤️ Herzgesund'};
+var ATAG_C = {quick:'tr', vegan:'tg', protein:'tb', herz:'ta'};
+function af(tag, btn) {
   ATAG = tag;
-  setActiveFilter('af-tag', btn);
+  setFbtn('af-tag', btn);
   var cards = document.querySelectorAll('#auf-grid .card');
   for (var i = 0; i < cards.length; i++) {
-    var r = D_AUF[parseInt(cards[i].getAttribute('data-i'), 10)];
+    var r = AUF[parseInt(cards[i].getAttribute('data-i'))];
     var ok = tag === 'alle' || (r.tags && r.tags.indexOf(tag) >= 0);
     cards[i].style.display = ok ? '' : 'none';
   }
 }
-
-function renderAufstriche() {
+function renderAuf() {
   var g = document.getElementById('auf-grid');
-  for (var i = 0; i < D_AUF.length; i++) {
-    var r = D_AUF[i];
+  for (var i = 0; i < AUF.length; i++) {
+    var r = AUF[i];
     var tags = '';
-    if (r.tags) {
-      for (var j = 0; j < r.tags.length; j++) {
-        var t = r.tags[j];
-        tags += '<span class="tag ' + (ATAG_CLS[t] || 'tw') + '">' + (ATAG_LABELS[t] || t) + '</span>';
-      }
+    if (r.tags) for (var j = 0; j < r.tags.length; j++) {
+      var t = r.tags[j];
+      tags += '<span class="tag ' + (ATAG_C[t]||'tw') + '">' + (ATAG_L[t]||t) + '</span>';
     }
-    if (r.zeit) tags += '<span class="tag tw">' + r.zeit + '</span>';
-    var tipH = r.tipp ? '<div class="tip">Tipp: ' + r.tipp + '</div>' : '';
-    var body = mkPortionBar(2)
-      + '<div class="lbl">Zutaten</div><table>' + mkTable(r.zutaten || []) + '</table>'
-      + '<div class="lbl">Zubereitung</div><ol>' + mkSteps(r.schritte || []) + '</ol>'
+    if (r.zeit) tags += '<span class="tag tw">⏱ ' + r.zeit + '</span>';
+    var tipH = r.tipp ? '<div class="tip">💡 ' + r.tipp + '</div>' : '';
+    var body = mkPor(2)
+      + '<div class="lbl">Zutaten</div><table>' + mkTable(r.zutaten||[]) + '</table>'
+      + '<div class="lbl">Zubereitung</div><ol>' + mkSteps(r.schritte||[]) + '</ol>'
       + tipH;
-    var card = mkCard(r.emoji || '', r.title, r.sub || '', tags, body, '');
+    var card = mkCard(r.emoji||'🥗', r.title, r.sub||'', tags, body, '');
     card.setAttribute('data-i', i);
     g.appendChild(card);
   }
 }
 
-/* ═══════════════════════════════════════════
-   COOK TIPS
-═══════════════════════════════════════════ */
-function renderCookTips() {
+/* ═══════════════════════════════════════════════════════
+   TIPPS SECTION
+═══════════════════════════════════════════════════════ */
+function renderTipps() {
   var w = document.getElementById('tipps-wrap');
-  if (!w || !D_COOK_TIPS) return;
-  for (var i = 0; i < D_COOK_TIPS.length; i++) {
-    var t = D_COOK_TIPS[i];
+  if (!w || !COOK_TIPS) return;
+  for (var i = 0; i < COOK_TIPS.length; i++) {
+    var t = COOK_TIPS[i];
     var items = '';
-    for (var j = 0; j < t.items.length; j++) {
+    for (var j = 0; j < t.items.length; j++)
       items += '<div class="tip-item"><span class="tip-num" style="color:' + t.col + '">' + (j+1) + '</span><span>' + t.items[j] + '</span></div>';
-    }
     var box = document.createElement('div');
-    box.className = 'tipbox';
-    box.innerHTML = '<div class="tipbox-hd"><span class="ico">' + t.ico + '</span>'
-      + '<span class="ttl" style="color:' + t.col + '">' + t.title + '</span>'
-      + '<span class="tipbox-chev">▾</span></div>'
-      + '<div class="tipbox-bd">' + items + '</div>';
-    (function(b){ b.querySelector('.tipbox-hd').addEventListener('click', function(){ b.classList.toggle('on'); }); })(box);
+    box.className = 'tip-box';
+    box.innerHTML = '<div class="tip-box-hd"><span class="tbi">' + t.ico + '</span><span class="tbt" style="color:' + t.col + '">' + t.title + '</span><span class="tip-box-chev">▾</span></div><div class="tip-box-bd">' + items + '</div>';
+    (function(b){ b.querySelector('.tip-box-hd').addEventListener('click', function(){ b.classList.toggle('open'); }); })(box);
     w.appendChild(box);
   }
 }
 
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════
    RANDOM RECIPE
-═══════════════════════════════════════════ */
-function randomRecipe() {
-  var secs = ['blitz','burger','crispy','curry'];
-  var grids = {blitz:'blitz-grid',burger:'burger-grid',crispy:'crispy-grid',curry:'curry-grid'};
-  var sec = secs[Math.floor(Math.random() * secs.length)];
-  goTo(sec);
-  var navBtn = document.querySelector('.nt[onclick*="' + sec + '"]');
-  if (navBtn) navBtn.classList.add('on');
+═══════════════════════════════════════════════════════ */
+function openRandom() {
+  var opts = [
+    {page:'blitz',  grid:'blitz-grid',  data: function(){ return BLITZ; }},
+    {page:'burger', grid:'burger-grid',  data: function(){ return BURGER; }},
+    {page:'crispy', grid:'crispy-grid',  data: function(){ return CRISPY; }},
+    {page:'curry',  grid:'curry-grid',   data: function(){ return CURRY; }},
+  ];
+  var o = opts[Math.floor(Math.random() * opts.length)];
+  show(o.page);
   setTimeout(function() {
-    var cards = document.querySelectorAll('#' + grids[sec] + ' .card');
+    var cards = document.querySelectorAll('#' + o.grid + ' .card');
     if (cards.length) {
       var card = cards[Math.floor(Math.random() * cards.length)];
-      card.classList.add('on');
+      card.classList.add('open');
       card.scrollIntoView({behavior:'smooth', block:'center'});
     }
-  }, 200);
+  }, 250);
 }
 
-/* ═══════════════════════════════════════════
-   INIT
-═══════════════════════════════════════════ */
-
-function renderWings() {
-  var w = document.getElementById('wings-grid');
-  if (!w) return;
-  var heatColor = {
-    'mild': 'var(--green)',
-    'mittel': 'var(--c-curry)',
-    'mittel-scharf': 'var(--c-crispy)',
-    'scharf': 'var(--c-crispy)',
-    'sehr scharf': '#ff1a1a'
-  };
-  for (var i = 0; i < D_WINGS.length; i++) {
-    var r = D_WINGS[i];
-    var hc = heatColor[r.heat] || 'var(--c-crispy)';
-    var marRows = mkTable(r.marinade);
-    var zutRows = mkTable(r.zutaten);
-    var stepsHtml = mkSteps(r.schritte);
-    var devH = '';
-    for (var j = 0; j < r.geraet.length; j++) devH += '<span class="dbadge">' + r.geraet[j] + '</span> ';
-    var ldlH = r.ldl ? '<div class="hbox">LDL-freundlich: Hähnchen ohne Haut hat wenig gesättigte Fette. Olivenöl statt Butter wo möglich.</div>' : '';
-    var card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML = '<div class="chd">'
-      + '<div class="cico">' + r.ico + '</div>'
-      + '<div class="cinf">'
-      + '<div class="ctitle">' + r.title + '</div>'
-      + '<div class="csub">' + r.sub + '</div>'
-      + '<div class="ctags">'
-      + '<span class="tag tr" style="background:none;border:1px solid ' + hc + ';color:' + hc + '">🌶️ ' + r.heat + '</span>'
-      + '<span class="tag tw">⏱ ' + r.zeit + '</span>'
-      + (r.ldl ? '<span class="tag tg">💚 LDL-ok</span>' : '')
-      + '</div></div>'
-      + '<span class="chev">▾</span></div>'
-      + '<div class="cbd"><div class="cin">'
-      + mkPortionBar(4)
-      + devH
-      + '<div class="lbl">Marinade (' + r.marinade_zeit + ')</div><table>' + marRows + '</table>'
-      + '<div class="lbl">Weitere Zutaten</div><table>' + zutRows + '</table>'
-      + '<div class="lbl">Zubereitung</div><ol>' + stepsHtml + '</ol>'
-      + '<div class="tip">Tipp: ' + r.tipp + '</div>'
-      + ldlH
-      + '</div></div>';
-    (function(card){ card.querySelector('.chd').addEventListener('click', function(){ toggleCard(card); }); })(card);
-    w.appendChild(card);
-  }
-}
-
-
-// Merge Wings into D_CRISPY as kat='wings'
-(function() {
-  if (typeof D_WINGS === 'undefined') return;
-  for (var i = 0; i < D_WINGS.length; i++) {
-    var w = D_WINGS[i];
-    D_CRISPY.push({
-      emoji: w.ico,
-      title: w.title,
-      sub: w.sub,
-      kategorie: 'wings',
-      protein: 'huhn',
-      heat: w.heat,
-      zeit: w.zeit,
-      badges: [
-        {cls: 'tr', txt: w.heat},
-        {cls: 'tw', txt: w.zeit},
-        {cls: w.ldl ? 'tg' : 'tw', txt: w.ldl ? 'LDL-ok' : 'Wings'}
-      ],
-      geraet: w.geraet,
-      marinade: {label: 'Marinade (' + w.marinade_zeit + ')', zutaten: w.marinade},
-      zutaten: w.zutaten,
-      schritte: w.schritte,
-      tipp: w.tipp
-    });
-  }
-})();
-
+/* ═══════════════════════════════════════════════════════
+   INIT — called after ALL data scripts have loaded
+═══════════════════════════════════════════════════════ */
 function init() {
   renderBlitz();
   renderBlitzTipps();
@@ -5288,18 +5100,11 @@ function init() {
   renderCrispySossen();
   renderPanaden();
   renderCurry();
-  renderAufstriche();
-  renderCookTips();
-  // hide initially
-  document.getElementById('paniert-grid').style.display = 'none'; /* initially hidden */
-  document.getElementById('sossen-section').style.display = 'none';
-  document.getElementById('burger-count').style.display = '';
-
-  document.getElementById('crispy-empty').style.display = 'none';
+  renderAuf();
+  renderTipps();
 }
 
 init();
-
 </script>
 
 </body>
