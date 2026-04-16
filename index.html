@@ -102,12 +102,13 @@ body {
 .nav-btn[data-p="crispy"]::after  { background: var(--crispy); }
 .nav-btn[data-p="curry"]::after   { background: var(--curry); }
 .nav-btn[data-p="auf"]::after     { background: var(--auf); }
-.nav-btn[data-p="tipps"]::after   { background: var(--tipps); }
+.nav-btn[data-p="plan"]::after    { background: var(--tipps); }
+.nav-btn[data-p="tipps"]::after    { background: var(--tipps); }
 
 .nav-ico { font-size: 1.25rem; line-height:1; transition: transform .15s; }
 .nav-btn.on .nav-ico { transform: scale(1.15); }
 .nav-lbl {
-  font-size: 0.48rem;
+  font-size: 0.42rem;
   font-weight: 800;
   letter-spacing: .06em;
   text-transform: uppercase;
@@ -840,6 +841,276 @@ ol li::before { font-size: .68rem !important; min-width: 24px !important; height
   padding-bottom: 20px !important;
 }
 
+
+/* ═══ WOCHENPLAN ════════════════════════════════════════════ */
+.wp-wrap { padding: 10px 14px 24px; max-width: 720px; margin: 0 auto; }
+
+/* Day card */
+.wp-day {
+  background: var(--card);
+  border: 2px solid var(--bdr);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  transition: border-color .15s;
+}
+.wp-day.has-meals { border-color: rgba(100,210,255,.3); }
+.wp-day-hd {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px; cursor: pointer;
+  background: var(--card2);
+  user-select: none;
+}
+.wp-day-name {
+  font-weight: 900; font-size: .9rem; color: var(--text); flex: 1;
+}
+.wp-day-count {
+  font-size: .62rem; font-weight: 700;
+  background: rgba(100,210,255,.15);
+  color: var(--tipps);
+  border: 1px solid rgba(100,210,255,.25);
+  border-radius: 99px; padding: 2px 8px;
+}
+.wp-day-chev { font-size: .7rem; color: var(--muted); transition: transform .22s; }
+.wp-day.open .wp-day-chev { transform: rotate(180deg); }
+.wp-day-bd { display: none; border-top: 1px solid var(--bdr); }
+.wp-day.open .wp-day-bd { display: block; }
+
+/* Meal slots */
+.wp-slot {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--bdr);
+  display: flex; align-items: center; gap: 10px;
+}
+.wp-slot:last-child { border-bottom: none; }
+.wp-slot-lbl {
+  font-size: .6rem; font-weight: 800; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--muted);
+  min-width: 72px;
+}
+.wp-slot-content { flex: 1; min-width: 0; }
+.wp-slot-empty {
+  font-size: .72rem; color: var(--muted); font-style: italic;
+}
+.wp-slot-recipe {
+  display: flex; align-items: center; gap: 8px;
+}
+.wp-slot-ico { font-size: 1.1rem; flex-shrink: 0; }
+.wp-slot-info { flex: 1; min-width: 0; }
+.wp-slot-title {
+  font-size: .76rem; font-weight: 700; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.wp-slot-sec { font-size: .6rem; color: var(--muted); }
+.wp-slot-del {
+  background: rgba(255,69,58,.15); border: 1px solid rgba(255,69,58,.25);
+  color: var(--crispy); border-radius: 6px;
+  width: 26px; height: 26px; font-size: .85rem;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+}
+.wp-slot-add {
+  background: var(--card2); border: 1.5px dashed var(--bdr);
+  color: var(--muted); border-radius: 8px;
+  padding: 5px 10px; font-size: .68rem; font-weight: 700;
+  cursor: pointer; transition: all .13s;
+  display: flex; align-items: center; gap: 5px;
+}
+.wp-slot-add:active { background: var(--bdr); }
+
+/* Recipe picker modal */
+.wp-modal-bg {
+  position: fixed; inset: 0; z-index: 99998;
+  background: rgba(0,0,0,.75);
+  display: flex; align-items: flex-end;
+  animation: fadeIn .15s ease;
+}
+.wp-modal {
+  background: #14141c;
+  border-radius: 20px 20px 0 0;
+  width: 100%; max-height: 80vh;
+  display: flex; flex-direction: column;
+  padding-bottom: var(--safe-bottom);
+  animation: slideUp .2s ease;
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: none; } }
+.wp-modal-hd {
+  padding: 16px 16px 10px;
+  display: flex; align-items: center; gap: 10px;
+  border-bottom: 1px solid var(--bdr);
+  flex-shrink: 0;
+}
+.wp-modal-title { font-weight: 900; font-size: .9rem; color: var(--text); flex: 1; }
+.wp-modal-close {
+  background: var(--card2); border: 1px solid var(--bdr);
+  color: var(--muted); border-radius: 99px;
+  width: 30px; height: 30px; font-size: 1rem;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.wp-search {
+  margin: 10px 14px 6px;
+  background: var(--card);
+  border: 1.5px solid var(--bdr);
+  border-radius: 9px;
+  padding: 8px 12px 8px 34px;
+  font-size: .8rem; color: var(--text);
+  outline: none; width: calc(100% - 28px);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%236a6a80' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242 1.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: 10px center;
+  flex-shrink: 0;
+}
+.wp-search:focus { border-color: var(--tipps); }
+.wp-sec-tabs {
+  display: flex; gap: 5px; padding: 4px 14px 8px;
+  overflow-x: auto; scrollbar-width: none; flex-shrink: 0;
+}
+.wp-sec-tabs::-webkit-scrollbar { display: none; }
+.wp-sec-tab {
+  flex-shrink: 0; background: var(--card); border: 1.5px solid var(--bdr);
+  color: var(--muted); padding: 4px 10px; border-radius: 99px;
+  font-size: .62rem; font-weight: 700; cursor: pointer; white-space: nowrap;
+}
+.wp-sec-tab.on { background: var(--tipps); border-color: var(--tipps); color: #000; }
+.wp-recipe-list {
+  overflow-y: auto; flex: 1; padding: 0 14px 8px;
+}
+.wp-recipe-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 0; border-bottom: 1px solid var(--bdr); cursor: pointer;
+  transition: background .1s;
+}
+.wp-recipe-item:last-child { border-bottom: none; }
+.wp-recipe-item:active { background: var(--card2); border-radius: 8px; padding-left: 6px; }
+.wp-recipe-item-ico {
+  font-size: 1.2rem; width: 36px; height: 36px;
+  background: var(--card2); border-radius: 8px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.wp-recipe-item-inf { flex: 1; min-width: 0; }
+.wp-recipe-item-title { font-size: .78rem; font-weight: 700; color: var(--text); }
+.wp-recipe-item-sub { font-size: .62rem; color: var(--muted); }
+.wp-recipe-item-sec { font-size: .55rem; font-weight: 800; letter-spacing: .08em; padding: 1px 6px; border-radius: 99px; }
+
+/* Einkaufsliste */
+.wp-actions {
+  display: flex; gap: 8px; padding: 10px 0 0;
+}
+.wp-btn {
+  flex: 1; padding: 10px; border-radius: 10px;
+  font-weight: 800; font-size: .75rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: all .13s; border: none;
+}
+.wp-btn-primary { background: var(--tipps); color: #000; }
+.wp-btn-secondary { background: var(--card2); border: 1.5px solid var(--bdr); color: var(--soft); }
+.wp-btn:active { transform: scale(.97); }
+.wp-empty-plan {
+  text-align: center; padding: 30px 20px;
+  color: var(--muted); font-size: .8rem; line-height: 1.8;
+}
+
+/* Shopping list modal */
+.wp-shop-list { overflow-y: auto; flex: 1; padding: 0 14px 8px; }
+.wp-shop-section { margin-bottom: 14px; }
+.wp-shop-sec-title {
+  font-size: .6rem; font-weight: 800; letter-spacing: .15em;
+  text-transform: uppercase; color: var(--tipps);
+  padding: 10px 0 6px; border-bottom: 1px solid var(--bdr); margin-bottom: 6px;
+}
+.wp-shop-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,.04);
+  cursor: pointer;
+}
+.wp-shop-item.checked { opacity: .45; }
+.wp-shop-item .wp-check {
+  width: 20px; height: 20px; border-radius: 6px;
+  border: 2px solid var(--bdr); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .7rem; transition: all .13s;
+}
+.wp-shop-item.checked .wp-check { background: var(--auf); border-color: var(--auf); color: #000; }
+.wp-shop-item .wp-ing { font-size: .76rem; color: var(--text); flex: 1; }
+.wp-shop-item.checked .wp-ing { text-decoration: line-through; color: var(--muted); }
+.wp-shop-item .wp-ing-amt { font-size: .7rem; color: var(--muted); font-weight: 700; }
+
+
+/* ═══ WOCHENPLAN ════════════════════════════════════════════ */
+.wp-wrap{padding:10px 14px 24px;max-width:720px;margin:0 auto}
+.wp-actions{display:flex;gap:8px;margin-bottom:14px}
+.wp-btn{flex:1;padding:11px;border-radius:11px;font-weight:800;font-size:.76rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;border:none;transition:all .13s}
+.wp-btn:active{transform:scale(.97)}
+.wp-btn-primary{background:var(--tipps);color:#000}
+.wp-btn-secondary{background:var(--card2);border:1.5px solid var(--bdr);color:var(--soft)}
+.wp-day{background:var(--card);border:2px solid var(--bdr);border-radius:14px;overflow:hidden;margin-bottom:8px;transition:border-color .15s}
+.wp-day.has-meal{border-color:rgba(100,210,255,.45)}
+.wp-day-row{display:flex;align-items:center;gap:10px;padding:12px 14px;min-height:62px}
+.wp-day-em{font-size:1.3rem;flex-shrink:0}
+.wp-day-name{font-weight:900;font-size:.84rem;color:var(--text);min-width:76px;flex-shrink:0}
+.wp-day-recipe{flex:1;min-width:0}
+.wp-slot-empty{font-size:.7rem;color:var(--muted);font-style:italic}
+.wp-recipe-pill{display:flex;align-items:center;gap:7px}
+.wp-recipe-pill-ico{font-size:1.1rem;flex-shrink:0}
+.wp-recipe-pill-title{font-size:.74rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px}
+.wp-recipe-pill-sec{font-size:.54rem;font-weight:800;padding:1px 6px;border-radius:99px;flex-shrink:0}
+.wp-del-btn{background:rgba(255,69,58,.15);border:1px solid rgba(255,69,58,.25);color:var(--crispy);border-radius:7px;width:28px;height:28px;font-size:1rem;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.wp-add-btn{background:var(--card2);border:1.5px dashed rgba(100,210,255,.3);color:var(--tipps);border-radius:9px;padding:6px 11px;font-size:.68rem;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.wp-add-btn:active{background:var(--bdr)}
+.wp-modal-bg{position:fixed;inset:0;z-index:99998;background:rgba(0,0,0,.75);display:flex;align-items:flex-end}
+.wp-modal{background:#14141c;border-radius:20px 20px 0 0;width:100%;max-height:80vh;display:flex;flex-direction:column;padding-bottom:var(--safe-bottom);animation:slideUp .2s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:none}}
+.wp-modal-hd{padding:16px 16px 10px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--bdr);flex-shrink:0}
+.wp-modal-title{font-weight:900;font-size:.9rem;color:var(--text);flex:1}
+.wp-modal-close{background:var(--card2);border:1px solid var(--bdr);color:var(--muted);border-radius:99px;width:30px;height:30px;font-size:1rem;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.wp-search{margin:10px 14px 6px;background:var(--card);border:1.5px solid var(--bdr);border-radius:9px;padding:9px 12px 9px 34px;font-size:.8rem;color:var(--text);outline:none;width:calc(100% - 28px);flex-shrink:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%236a6a80' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a.007.007 0 0 0-.001 0l.001-.001a6.5 6.5 0 0 0-4.344 1.656zm-5.242 1.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:10px center}
+.wp-search:focus{border-color:var(--tipps)}
+.wp-sec-tabs{display:flex;gap:5px;padding:4px 14px 8px;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+.wp-sec-tabs::-webkit-scrollbar{display:none}
+.wp-sec-tab{flex-shrink:0;background:var(--card);border:1.5px solid var(--bdr);color:var(--muted);padding:4px 10px;border-radius:99px;font-size:.62rem;font-weight:700;cursor:pointer;white-space:nowrap}
+.wp-sec-tab.on{background:var(--tipps);border-color:var(--tipps);color:#000}
+.wp-recipe-list{overflow-y:auto;flex:1;padding:0 14px 8px}
+.wp-recipe-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bdr);cursor:pointer}
+.wp-recipe-item:last-child{border-bottom:none}
+.wp-recipe-item:active{opacity:.7}
+.wp-recipe-item-ico{font-size:1.2rem;width:36px;height:36px;background:var(--card2);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.wp-recipe-item-inf{flex:1;min-width:0}
+.wp-recipe-item-title{font-size:.78rem;font-weight:700;color:var(--text)}
+.wp-recipe-item-sub{font-size:.62rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wp-recipe-item-sec{font-size:.55rem;font-weight:800;padding:2px 7px;border-radius:99px;flex-shrink:0}
+.wp-shop-list{overflow-y:auto;flex:1;padding:0 14px 8px}
+.wp-shop-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05);cursor:pointer}
+.wp-shop-item:last-child{border-bottom:none}
+.wp-shop-item.checked{opacity:.4}
+.wp-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--bdr);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.75rem;transition:all .13s}
+.wp-shop-item.checked .wp-check{background:var(--auf);border-color:var(--auf);color:#000}
+.wp-ing{font-size:.78rem;color:var(--text);flex:1}
+.wp-shop-item.checked .wp-ing{text-decoration:line-through;color:var(--muted)}
+.wp-ing-amt{font-size:.7rem;color:var(--muted);font-weight:700;text-align:right}
+
+
+/* Plan portion row */
+.wp-por-row { display:flex; align-items:center; gap:10px; padding:6px 14px 10px; border-top:1px solid var(--bdr); }
+.wp-por-row.hidden { display:none !important; }
+.wp-por-lbl { font-size:.62rem; font-weight:700; color:var(--muted); flex:1; }
+.wp-por-btn { background:var(--bdr); border:none; color:var(--text); width:28px; height:28px; border-radius:7px; font-size:1.1rem; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.wp-por-val { font-family:-apple-system,sans-serif; font-weight:900; font-size:1.1rem; min-width:22px; text-align:center; color:var(--tipps); }
+
+
+/* ── PANTRY ───────────────────────────────────────── */
+.pantry-sec {
+  font-size:.6rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--auf); padding:12px 0 6px; border-bottom:1px solid rgba(58,232,85,.2);
+  margin-bottom:4px;
+}
+.pantry-item {
+  font-size:.78rem; color:var(--text); padding:7px 0 7px 16px;
+  border-bottom:1px solid rgba(255,255,255,.04); position:relative;
+}
+.pantry-item::before {
+  content:"✓"; position:absolute; left:0; color:rgba(58,232,85,.5);
+  font-size:.65rem; font-weight:900;
+}
+
 </style>
 
 </head>
@@ -859,12 +1130,13 @@ ol li::before { font-size: .68rem !important; min-width: 24px !important; height
     <div class="home-grid">
       <div class="home-card c-blitz"  onclick="show('blitz')"><span class="hc-ico">⚡</span><span class="hc-t">Blitz Küche</span><span class="hc-s">40 Rez · ≤15 Min</span></div>
       <div class="home-card c-burger" onclick="show('burger')"><span class="hc-ico">🍔</span><span class="hc-t">Burger Lab</span><span class="hc-s">30 Burger + Soßen</span></div>
-      <div class="home-card c-crispy" onclick="show('crispy')"><span class="hc-ico">🍗</span><span class="hc-t">Crispy Chicken</span><span class="hc-s">20+ Rez + Wings</span></div>
+      <div class="home-card c-crispy" onclick="show('crispy')"><span class="hc-ico">🍗</span><span class="hc-t">Crispy Chicken</span><span class="hc-s">30 Rez · Fingers & Wraps</span></div>
       <div class="home-card c-curry"  onclick="show('curry')"><span class="hc-ico">🍛</span><span class="hc-t">Curry &amp; Eintopf</span><span class="hc-s">30+ Rezepte</span></div>
       <div class="home-card c-auf"    onclick="show('auf')"><span class="hc-ico">🥪</span><span class="hc-t">Aufstriche</span><span class="hc-s">13 Rezepte · LDL-freundlich</span></div>
       <div class="home-card c-tipps"  onclick="show('tipps')"><span class="hc-ico">💡</span><span class="hc-t">Küchen-Tipps</span><span class="hc-s">7 Kapitel</span></div>
     </div>
     <button class="random-btn" onclick="openRandom()">🎲 Zufälliges Rezept</button>
+    <button class="random-btn" style="margin-top:8px;border-color:rgba(58,232,85,.3);color:var(--auf)" onclick="openPantry()">🛒 Basis-Lebensmittel</button>
   </div>
 </div>
 
@@ -969,7 +1241,7 @@ ol li::before { font-size: .68rem !important; min-width: 24px !important; height
     <div class="hero-bar"><span>HOT & CRISPY</span><span>AF · BACKOFEN · TM7</span></div>
     <div class="hero-body">
       <div class="hero-title">CRISPY<br><em>CHICKEN</em></div>
-      <div class="hero-sub">Burger · Wraps · Fingers · Wings · Dips<br>20+ Rezepte · Panaden-Guide · Soßen</div>
+      <div class="hero-sub">10 Fingers · 10 Wraps · Wings · Dips · Healthy<br>30+ Rezepte · Panaden-Guide · Soßen</div>
       <div class="hero-pills">
         <span class="pill hl">🌬️ Air Fryer</span>
         <span class="pill hl">🍖 Wings</span>
@@ -987,7 +1259,6 @@ ol li::before { font-size: .68rem !important; min-width: 24px !important; height
     <div class="fwrap">
       <div class="frow"><div class="flbl">Kategorie</div><div class="fbar" id="cf-kat">
         <button class="fbtn on" onclick="cf('kat','alle',this)">Alle</button>
-        <button class="fbtn" onclick="cf('kat','burger',this)">🍔 Burger</button>
         <button class="fbtn" onclick="cf('kat','wrap',this)">🌯 Wrap</button>
         <button class="fbtn" onclick="cf('kat','fingers',this)">🍗 Fingers</button>
         <button class="fbtn" onclick="cf('kat','dip',this)">🥔 Dips</button>
@@ -1098,6 +1369,252 @@ ol li::before { font-size: .68rem !important; min-width: 24px !important; height
   <div style="padding:14px 14px 30px;max-width:720px;margin:0 auto" id="tipps-wrap"></div>
 </div>
 
+<!-- ══ WOCHENPLAN PAGE ══ -->
+
+<div class="page" id="page-plan">
+  <div class="hero">
+    <div class="hero-bar" style="background:var(--tipps);color:#000"><span>WOCHENPLAN</span><span>7 TAGE</span></div>
+    <div class="hero-body">
+      <div class="hero-title">WOCHEN<span style="color:var(--tipps)">PLAN</span></div>
+      <div class="hero-sub">Ein Gericht pro Tag planen<br>Einkaufsliste automatisch generieren</div>
+      <div class="hero-pills"><span class="pill" style="border-color:rgba(100,210,255,.4);color:var(--tipps)">📅 7 Tage</span><span class="pill" style="border-color:rgba(50,215,75,.4);color:var(--auf)">🛒 Einkaufsliste</span></div>
+    </div>
+  </div>
+  <div class="wp-wrap">
+    <div class="wp-actions">
+      <button class="wp-btn wp-btn-primary" onclick="showShoppingList()">🛒 Einkaufsliste</button>
+      <button class="wp-btn wp-btn-secondary" onclick="clearPlan()">🗑️ Plan leeren</button>
+    </div>
+    <div class="wp-day" id="wpday-0">
+      <div class="wp-day-row">
+        <span class="wp-day-em">💪</span>
+        <span class="wp-day-name">Montag</span>
+        <div class="wp-day-recipe" id="wpr-0"><div class="wp-slot-empty">Nichts geplant</div></div>
+        <button class="wp-add-btn" id="wpbtn-0" onclick="openPicker(0)">+ Rezept</button>
+      </div>
+      <div class="wp-por-row hidden" id="wpor-0">
+        <span class="wp-por-lbl">🍽️ Portionen</span>
+        <button class="wp-por-btn" onclick="wpChangePor(0,-1)">−</button>
+        <span class="wp-por-val" id="wpporval-0">2</span>
+        <button class="wp-por-btn" onclick="wpChangePor(0,+1)">+</button>
+      </div>
+    </div>
+    <div class="wp-day" id="wpday-1">
+      <div class="wp-day-row">
+        <span class="wp-day-em">💪</span>
+        <span class="wp-day-name">Dienstag</span>
+        <div class="wp-day-recipe" id="wpr-1"><div class="wp-slot-empty">Nichts geplant</div></div>
+        <button class="wp-add-btn" id="wpbtn-1" onclick="openPicker(1)">+ Rezept</button>
+      </div>
+      <div class="wp-por-row hidden" id="wpor-1">
+        <span class="wp-por-lbl">🍽️ Portionen</span>
+        <button class="wp-por-btn" onclick="wpChangePor(1,-1)">−</button>
+        <span class="wp-por-val" id="wpporval-1">2</span>
+        <button class="wp-por-btn" onclick="wpChangePor(1,+1)">+</button>
+      </div>
+    </div>
+    <div class="wp-day" id="wpday-2">
+      <div class="wp-day-row">
+        <span class="wp-day-em">💪</span>
+        <span class="wp-day-name">Mittwoch</span>
+        <div class="wp-day-recipe" id="wpr-2"><div class="wp-slot-empty">Nichts geplant</div></div>
+        <button class="wp-add-btn" id="wpbtn-2" onclick="openPicker(2)">+ Rezept</button>
+      </div>
+      <div class="wp-por-row hidden" id="wpor-2">
+        <span class="wp-por-lbl">🍽️ Portionen</span>
+        <button class="wp-por-btn" onclick="wpChangePor(2,-1)">−</button>
+        <span class="wp-por-val" id="wpporval-2">2</span>
+        <button class="wp-por-btn" onclick="wpChangePor(2,+1)">+</button>
+      </div>
+    </div>
+    <div class="wp-day" id="wpday-3">
+      <div class="wp-day-row">
+        <span class="wp-day-em">💪</span>
+        <span class="wp-day-name">Donnerstag</span>
+        <div class="wp-day-recipe" id="wpr-3"><div class="wp-slot-empty">Nichts geplant</div></div>
+        <button class="wp-add-btn" id="wpbtn-3" onclick="openPicker(3)">+ Rezept</button>
+      </div>
+      <div class="wp-por-row hidden" id="wpor-3">
+        <span class="wp-por-lbl">🍽️ Portionen</span>
+        <button class="wp-por-btn" onclick="wpChangePor(3,-1)">−</button>
+        <span class="wp-por-val" id="wpporval-3">2</span>
+        <button class="wp-por-btn" onclick="wpChangePor(3,+1)">+</button>
+      </div>
+    </div>
+    <div class="wp-day" id="wpday-4">
+      <div class="wp-day-row">
+        <span class="wp-day-em">🍕</span>
+        <span class="wp-day-name">Freitag</span>
+        <div class="wp-day-recipe" id="wpr-4"><div class="wp-slot-empty">Nichts geplant</div></div>
+        <button class="wp-add-btn" id="wpbtn-4" onclick="openPicker(4)">+ Rezept</button>
+      </div>
+      <div class="wp-por-row hidden" id="wpor-4">
+        <span class="wp-por-lbl">🍽️ Portionen</span>
+        <button class="wp-por-btn" onclick="wpChangePor(4,-1)">−</button>
+        <span class="wp-por-val" id="wpporval-4">2</span>
+        <button class="wp-por-btn" onclick="wpChangePor(4,+1)">+</button>
+      </div>
+    </div>
+    <div class="wp-day" id="wpday-5">
+      <div class="wp-day-row">
+        <span class="wp-day-em">🥳</span>
+        <span class="wp-day-name">Samstag</span>
+        <div class="wp-day-recipe" id="wpr-5"><div class="wp-slot-empty">Nichts geplant</div></div>
+        <button class="wp-add-btn" id="wpbtn-5" onclick="openPicker(5)">+ Rezept</button>
+      </div>
+      <div class="wp-por-row hidden" id="wpor-5">
+        <span class="wp-por-lbl">🍽️ Portionen</span>
+        <button class="wp-por-btn" onclick="wpChangePor(5,-1)">−</button>
+        <span class="wp-por-val" id="wpporval-5">2</span>
+        <button class="wp-por-btn" onclick="wpChangePor(5,+1)">+</button>
+      </div>
+    </div>
+    <div class="wp-day" id="wpday-6">
+      <div class="wp-day-row">
+        <span class="wp-day-em">😴</span>
+        <span class="wp-day-name">Sonntag</span>
+        <div class="wp-day-recipe" id="wpr-6"><div class="wp-slot-empty">Nichts geplant</div></div>
+        <button class="wp-add-btn" id="wpbtn-6" onclick="openPicker(6)">+ Rezept</button>
+      </div>
+      <div class="wp-por-row hidden" id="wpor-6">
+        <span class="wp-por-lbl">🍽️ Portionen</span>
+        <button class="wp-por-btn" onclick="wpChangePor(6,-1)">−</button>
+        <span class="wp-por-val" id="wpporval-6">2</span>
+        <button class="wp-por-btn" onclick="wpChangePor(6,+1)">+</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PANTRY MODAL -->
+
+<div class="wp-modal-bg hidden" id="pantry-modal" onclick="closePantry(event)">
+  <div class="wp-modal" style="max-height:88vh">
+    <div class="wp-modal-hd">
+      <div class="wp-modal-title">🛒 Basis-Lebensmittel</div>
+      <div class="wp-modal-close" onclick="closePantry()">✕</div>
+    </div>
+    <div class="wp-shop-list" style="padding:0 14px 16px">
+
+```
+  <div style="font-size:.7rem;color:var(--muted);padding:10px 0 14px;line-height:1.6">
+    Diese Zutaten halten lange und decken <strong style="color:var(--text)">90% aller Rezepte</strong> ab. Einmal einkaufen – immer bereit.
+  </div>
+
+  <div class="pantry-sec">🫙 Gewürze & Würzmittel</div>
+  <div class="pantry-item">Sojasoße (Tamari)</div>
+  <div class="pantry-item">Fischsauce oder Worcestershire</div>
+  <div class="pantry-item">Sriracha & Tabasco</div>
+  <div class="pantry-item">Gochujang (Korean Chilipaste)</div>
+  <div class="pantry-item">Miso-Paste (hell & dunkel)</div>
+  <div class="pantry-item">Harissa-Paste</div>
+  <div class="pantry-item">Ketchup & Dijon-Senf</div>
+  <div class="pantry-item">Honig & Ahornsirup</div>
+  <div class="pantry-item">Apfelessig & Reisessig</div>
+  <div class="pantry-item">Kokosöl, Rapsöl & Sesamöl</div>
+  <div class="pantry-item">Olivenöl extra vergine</div>
+
+  <div class="pantry-sec">🧂 Trockene Gewürze</div>
+  <div class="pantry-item">Paprikapulver (süß + scharf + Smoked)</div>
+  <div class="pantry-item">Kreuzkümmel (Cumin)</div>
+  <div class="pantry-item">Kurkuma</div>
+  <div class="pantry-item">Koriander gemahlen</div>
+  <div class="pantry-item">Cayennepfeffer</div>
+  <div class="pantry-item">Zimt</div>
+  <div class="pantry-item">Oregano & Thymian</div>
+  <div class="pantry-item">Knoblauchpulver & Zwiebelpulver</div>
+  <div class="pantry-item">Fleur de Sel & schwarzer Pfeffer</div>
+  <div class="pantry-item">Chiliflocken</div>
+  <div class="pantry-item">Garam Masala</div>
+
+  <div class="pantry-sec">🥫 Dosen & Konserven</div>
+  <div class="pantry-item">Dosentomaten (ganz + stückig)</div>
+  <div class="pantry-item">Kichererbsen (Dose)</div>
+  <div class="pantry-item">Linsen rot & grün</div>
+  <div class="pantry-item">Kokosmilch (Vollfett)</div>
+  <div class="pantry-item">Schwarze Bohnen</div>
+  <div class="pantry-item">Thunfisch in Olivenöl</div>
+  <div class="pantry-item">Mais (Dose)</div>
+  <div class="pantry-item">Chipotle in Adobo</div>
+
+  <div class="pantry-sec">🌾 Trocken & Stärke</div>
+  <div class="pantry-item">Basmati-Reis & Jasmin-Reis</div>
+  <div class="pantry-item">Pasta (Penne, Spaghetti, Linguine)</div>
+  <div class="pantry-item">Reisnudeln (breit + schmal)</div>
+  <div class="pantry-item">Panko-Paniermehl</div>
+  <div class="pantry-item">Mehl (Typ 405) & Buchweizenmehl</div>
+  <div class="pantry-item">Speisestärke (Maizena)</div>
+  <div class="pantry-item">Haferflocken</div>
+  <div class="pantry-item">Rote & grüne Linsen</div>
+
+  <div class="pantry-sec">🧊 Tiefkühl-Basics</div>
+  <div class="pantry-item">Hähnchenbrustfilets (TK)</div>
+  <div class="pantry-item">Garnelen (TK, geschält)</div>
+  <div class="pantry-item">Erbsen & Edamame</div>
+  <div class="pantry-item">Spinat (TK)</div>
+  <div class="pantry-item">Maiskölbchen (TK)</div>
+
+  <div class="pantry-sec">🌿 Kühlschrank-Basics</div>
+  <div class="pantry-item">Eier (immer 10-12 Stück)</div>
+  <div class="pantry-item">Butter & Ghee</div>
+  <div class="pantry-item">Joghurt 0% (Griechisch)</div>
+  <div class="pantry-item">Frischkäse & Parmesan</div>
+  <div class="pantry-item">Knoblauch (frisch)</div>
+  <div class="pantry-item">Ingwer (frisch – einfrieren!)</div>
+  <div class="pantry-item">Frühlingszwiebeln</div>
+  <div class="pantry-item">Zitronen & Limetten</div>
+  <div class="pantry-item">Karotten & Zwiebeln</div>
+
+  <div class="pantry-sec">🍶 Asia-Regal</div>
+  <div class="pantry-item">Mirin & Sake (oder Reisessig)</div>
+  <div class="pantry-item">Sesam (hell + dunkel)</div>
+  <div class="pantry-item">Tahini</div>
+  <div class="pantry-item">Kewpie Mayo</div>
+  <div class="pantry-item">Dashi-Pulver</div>
+  <div class="pantry-item">Aonori & Katsuobushi</div>
+  <div class="pantry-item">Gochugaru (Korean Chiliflocken)</div>
+
+  <div class="pantry-sec">💡 Profi-Tipps</div>
+  <div style="font-size:.72rem;color:var(--muted);line-height:1.65;padding:8px 0">
+    <div style="margin-bottom:6px">🧊 <strong style="color:var(--text)">Ingwer einfrieren</strong> – direkt reiben, hält Monate</div>
+    <div style="margin-bottom:6px">🫙 <strong style="color:var(--text)">Shio-Koji</strong> (Salzmalz) im Kühlschrank: mariniert und würzt alles in einem</div>
+    <div style="margin-bottom:6px">🥫 <strong style="color:var(--text)">Dosentomaten</strong> immer in 2 Varianten: für Curry und Saucen</div>
+    <div style="margin-bottom:6px">🌶️ <strong style="color:var(--text)">Gochujang</strong> hält monatelang im Kühlschrank und gibt Tiefe, nicht nur Schärfe</div>
+    <div>🫒 <strong style="color:var(--text)">Sesamöl</strong> erst am Ende zugeben – nie zum Braten</div>
+  </div>
+</div>
+```
+
+  </div>
+</div>
+
+<!-- PICKER MODAL -->
+
+<div class="wp-modal-bg hidden" id="wp-picker" onclick="closePicker(event)">
+  <div class="wp-modal">
+    <div class="wp-modal-hd"><div class="wp-modal-title" id="picker-title">Rezept wählen</div><div class="wp-modal-close" onclick="closePicker()">✕</div></div>
+    <input class="wp-search" id="wp-search" placeholder="Rezept suchen..." oninput="filterPicker(this.value)">
+    <div class="wp-sec-tabs">
+      <button class="wp-sec-tab on" onclick="setPickerSec('alle',this)">Alle</button>
+      <button class="wp-sec-tab" onclick="setPickerSec('blitz',this)">⚡ Blitz</button>
+      <button class="wp-sec-tab" onclick="setPickerSec('burger',this)">🍔 Burger</button>
+      <button class="wp-sec-tab" onclick="setPickerSec('crispy',this)">🍗 Crispy</button>
+      <button class="wp-sec-tab" onclick="setPickerSec('curry',this)">🍛 Curry</button>
+      <button class="wp-sec-tab" onclick="setPickerSec('auf',this)">🥪 Aufstriche</button>
+    </div>
+    <div class="wp-recipe-list" id="wp-recipe-list"></div>
+  </div>
+</div>
+
+<!-- SHOPPING LIST MODAL -->
+
+<div class="wp-modal-bg hidden" id="wp-shopmodal" onclick="closeShop(event)">
+  <div class="wp-modal">
+    <div class="wp-modal-hd"><div class="wp-modal-title">🛒 Einkaufsliste</div><div class="wp-modal-close" onclick="closeShop()">✕</div></div>
+    <div class="wp-shop-list" id="wp-shop-list"></div>
+  </div>
+</div>
+
 <!-- ══ BOTTOM NAV ═══════════════════════════════════════════════ -->
 
 <div id="nav">
@@ -1107,6 +1624,7 @@ ol li::before { font-size: .68rem !important; min-width: 24px !important; height
   <button class="nav-btn"    data-p="crispy" onclick="show('crispy',this)"><span class="nav-ico">🍗</span><span class="nav-lbl">Crispy</span><span class="nav-badge">20</span></button>
   <button class="nav-btn"    data-p="curry"  onclick="show('curry',this)"><span class="nav-ico">🍛</span><span class="nav-lbl">Curry</span><span class="nav-badge">30</span></button>
   <button class="nav-btn"    data-p="auf"    onclick="show('auf',this)"><span class="nav-ico">🥪</span><span class="nav-lbl">Aufstriche</span></button>
+  <button class="nav-btn"    data-p="plan"   onclick="show('plan',this)"><span class="nav-ico">📅</span><span class="nav-lbl">Plan</span></button>
   <button class="nav-btn"    data-p="tipps"  onclick="show('tipps',this)"><span class="nav-ico">💡</span><span class="nav-lbl">Tipps</span></button>
 </div>
 
@@ -2133,294 +2651,8 @@ const BURGER_SOSSEN = [
 ];
 </script>
 
-<script>
-const CRISPY = [
-  // ── BURGER ──────────────────────────────────────────
-  {
-    emoji: '🍔',
-    title: 'Nashville Hot Chicken Burger',
-    sub: 'Spicy Buttermilk · Brioche · Pickles',
-    kategorie: 'burger',
-    heat: '🌶️🌶️🌶️',
-    geraet: ['Air Fryer', 'Backofen'],
-    badges: [{cls:'badge-fire',txt:'🌶️ Sehr scharf'},{cls:'badge-gold',txt:'⏱ 35 Min'}],
-    marinade: {
-      label: 'Buttermilch-Marinade (mind. 1h)',
-      zutaten: [
-        ['Hähnchenbrust', '2 Stück'],
-        ['Buttermilch', '200 ml'],
-        ['Knoblauch', '2 Zehen (gerieben)'],
-        ['Paprikapulver', '1 TL'],
-        ['Cayennepfeffer', '1 TL'],
-        ['Salz', '1 TL'],
-      ]
-    },
-    zutaten: [
-      ['Paniermehl (Panko)', '100 g'],
-      ['Mehl', '50 g'],
-      ['Paprika scharf', '1 TL'],
-      ['Knoblauchpulver', '1 TL'],
-      ['Cayenne', '½ TL'],
-      ['Nashville-Hot-Öl (s.u.)', '3 EL'],
-      ['Brioche-Buns', '2 Stück'],
-      ['Coleslaw, Pickles, Mayo', 'nach Wunsch'],
-    ],
-    schritte: [
-      '<strong>Marinade:</strong> Hühnerbrust 1–4h in Buttermilch-Marinade einlegen.',
-      '<strong>Panade:</strong> Panko mit Paprika, Knoblauchpulver, Cayenne und Salz mischen.',
-      '<strong>Panieren:</strong> Hähnchen aus Marinade nehmen, durch Mehl, dann zurück in Buttermilch, dann in Panko-Mix.',
-      '<strong>Air Fryer:</strong> 200 °C, 18–22 Min, nach 10 Min wenden. Oder Backofen 220 °C, 25 Min auf Gitterrost.',
-      '<strong>Hot Oil:</strong> 3 EL Rapsöl erhitzen, 2 TL Cayenne + 1 TL Paprika + 1 TL brauner Zucker + Prise Salz einrühren. Über fertige Chicken gießen.',
-      'Buns toasten, mit Mayo, Pickles, Coleslaw und Hot Chicken belegen.',
-    ],
-    tipp: 'Das Geheimnis: Panko + Buttermilch-Marinade = maximale Crispiness. Nashville Hot Oil direkt vor dem Servieren drüber – nicht vorher!',
-  },
-  {
-    emoji: '🍗',
-    title: 'Korean Fried Chicken Burger',
-    sub: 'Gochujang-Glasur · Kimchi · Ssam',
-    kategorie: 'burger',
-    heat: '🌶️🌶️',
-    geraet: ['Air Fryer', 'Backofen'],
-    badges: [{cls:'badge-blue',txt:'🇰🇷 Korean Style'},{cls:'badge-gold',txt:'⏱ 40 Min'}],
-    marinade: {
-      label: 'Soja-Ingwer-Marinade (30 Min)',
-      zutaten: [
-        ['Hähnchenschenkel (ausgelöst)', '400 g'],
-        ['Sojasoße', '2 EL'],
-        ['Ingwer (gerieben)', '1 TL'],
-        ['Knoblauch', '2 Zehen'],
-        ['Sesamöl', '1 TL'],
-      ]
-    },
-    zutaten: [
-      ['Speisestärke (Maizena)', '60 g'],
-      ['Panko', '60 g'],
-      ['Gochujang-Paste', '2 EL'],
-      ['Honig', '1 EL'],
-      ['Sojasoße', '1 EL'],
-      ['Sesamöl', '1 TL'],
-      ['Knoblauch (gerieben)', '1 Zehe'],
-      ['Sesam + Frühlingszwiebeln', 'zum Garnieren'],
-      ['Milchbuns oder Brioche', '2 Stück'],
-    ],
-    schritte: [
-      '<strong>Marinade:</strong> Hähnchen 30 Min marinieren.',
-      '<strong>Panade:</strong> Hähnchen in Speisestärke wenden, dann in Panko drücken.',
-      '<strong>Air Fryer:</strong> 190 °C, 20 Min, wenden nach 10 Min. Backofen: 210 °C, 25 Min.',
-      '<strong>Glasur:</strong> Gochujang, Honig, Sojasoße, Sesamöl und Knoblauch verrühren, kurz in der Pfanne erwärmen.',
-      'Fertige Chicken in Glasur wenden. Mit Sesam und Frühlingszwiebeln bestreuen.',
-      'Buns toasten und mit Kimchi, Gurke und dem Chicken belegen.',
-    ],
-    tipp: 'Speisestärke statt Mehl = das koreanische Crispy-Geheimnis. Doppelt frittieren macht es noch knuspriger – im Air Fryer zweimal je 10 Min bei 200 °C.',
-  },
-
-  // ── WRAP ──────────────────────────────────────────
-  {
-    emoji: '🌯',
-    title: 'Spicy Chicken Wrap',
-    sub: 'Buffalo Chicken · Ranch · Eisberg',
-    kategorie: 'wrap',
-    heat: '🌶️🌶️',
-    geraet: ['Air Fryer', 'Backofen'],
-    badges: [{cls:'badge-fire',txt:'🦬 Buffalo'},{cls:'badge-gold',txt:'⏱ 25 Min'}],
-    marinade: null,
-    zutaten: [
-      ['Hähnchenstreifen', '400 g'],
-      ['Paprikapulver scharf', '1 TL'],
-      ['Knoblauchpulver', '1 TL'],
-      ['Olivenöl', '1 EL'],
-      ['Buffalo-Soße (s.u.)', '4 EL'],
-      ['Tortilla (groß)', '2 Stück'],
-      ['Eisbergsalat', '4 Blätter'],
-      ['Tomaten', '1 Stück'],
-      ['Ranch-Dressing (s.u.)', '3 EL'],
-      ['Gouda oder Cheddar (gerieben)', '40 g'],
-    ],
-    schritte: [
-      'Hähnchenstreifen mit Paprika, Knoblauch, Olivenöl, Salz & Pfeffer vermengen.',
-      '<strong>Air Fryer:</strong> 200 °C, 12–14 Min. Backofen: 220 °C, 18 Min auf Backpapier.',
-      'Fertige Streifen in Buffalo-Soße schwenken.',
-      'Tortilla leicht anwärmen. Ranch auf die Mitte streichen.',
-      'Salat, Tomaten, Käse, dann Buffalo Chicken drauflegen.',
-      'Fest einrollen und diagonal aufschneiden.',
-    ],
-    tipp: 'Tortilla in der trockenen Pfanne 20 Sek. anwärmen – macht sie flexibler und bricht nicht beim Rollen.',
-  },
-  {
-    emoji: '🌯',
-    title: 'Crispy Chicken Caesar Wrap',
-    sub: 'Parmesan Crunch · Caesar · Romaine',
-    kategorie: 'wrap',
-    heat: '🌶️',
-    geraet: ['Air Fryer', 'Backofen', 'TM7'],
-    badges: [{cls:'badge-green',txt:'⭐ Familientauglich'},{cls:'badge-gold',txt:'⏱ 30 Min'}],
-    marinade: null,
-    zutaten: [
-      ['Hähnchenbrust', '2 Stück'],
-      ['Parmesan (fein gerieben)', '40 g'],
-      ['Panko', '60 g'],
-      ['Dijon-Senf', '1 EL'],
-      ['Olivenöl', '1 EL'],
-      ['Knoblauchpulver', '½ TL'],
-      ['Römersalat', '4 Blätter'],
-      ['Caesar-Dressing', '4 EL'],
-      ['Tortilla-Wraps', '2 Stück'],
-    ],
-    schritte: [
-      'Hähnchenbrust plattieren (auf ca. 2 cm). Mit Senf und Olivenöl einstreichen.',
-      'Panko mit Parmesan und Knoblauchpulver mischen. Hähnchen darin wenden und gut andrücken.',
-      '<strong>Air Fryer:</strong> 190 °C, 16–18 Min. Backofen: 200 °C, 22 Min.',
-      '<strong>TM7:</strong> Varoma 100 °C, 20 Min (weniger crispy aber saftig) – dann kurz in der Pfanne anknuspern.',
-      'Hähnchen in Streifen schneiden. Tortilla mit Caesar-Dressing bestreichen.',
-      'Salat, dann Chicken-Streifen drauflegen, rollen.',
-    ],
-    tipp: 'Parmesan in der Panade = extra Knusper-Kick. Keine Butter oder Margarine nötig.',
-  },
-  {
-    emoji: '🌯',
-    title: 'Shawarma Chicken Wrap',
-    sub: 'Orientalische Gewürze · Joghurt · Granatapfel',
-    kategorie: 'wrap',
-    heat: '🌶️',
-    geraet: ['Air Fryer', 'Backofen', 'TM7'],
-    badges: [{cls:'badge-blue',txt:'🕌 Orientalisch'},{cls:'badge-gold',txt:'⏱ 30 Min + Marinade'}],
-    marinade: {
-      label: 'Shawarma-Marinade (mind. 2h)',
-      zutaten: [
-        ['Hähnchenschenkel (ausgelöst)', '400 g'],
-        ['Joghurt', '3 EL'],
-        ['Olivenöl', '2 EL'],
-        ['Zitronensaft', '2 EL'],
-        ['Kurkuma', '1 TL'],
-        ['Kreuzkümmel', '1 TL'],
-        ['Paprika', '1 TL'],
-        ['Zimt', '¼ TL'],
-        ['Knoblauch', '3 Zehen'],
-      ]
-    },
-    zutaten: [
-      ['Fladenbrot oder Tortilla', '2 Stück'],
-      ['Joghurt', '100 g'],
-      ['Knoblauch (gerieben)', '1 Zehe'],
-      ['Gurke', '½ Stück'],
-      ['Tomaten', '1 Stück'],
-      ['Petersilie', '1 Handvoll'],
-    ],
-    schritte: [
-      '<strong>Marinade:</strong> Hähnchen mind. 2h, besser über Nacht marinieren.',
-      '<strong>Air Fryer:</strong> 200 °C, 18–22 Min, wenden nach 10 Min.',
-      '<strong>Backofen:</strong> 220 °C, 25 Min auf dem Gitterrost.',
-      'Knoblauch-Joghurt-Soße: Joghurt + Knoblauch + Salz verrühren.',
-      'Hähnchen in Streifen schneiden. Brot erwärmen.',
-      'Mit Soße, Gemüse, Petersilie und Chicken belegen und einwickeln.',
-    ],
-    tipp: 'Über Nacht marinieren macht einen riesigen Geschmacksunterschied. Der Zimt ist das Geheimnis!',
-  },
-
-  // ── FINGERS ──────────────────────────────────────────
-  {
-    emoji: '🍗',
-    title: 'Classic Crispy Chicken Fingers',
-    sub: 'Doppelpanade · Knoblauch · Honey Mustard',
-    kategorie: 'fingers',
-    heat: '🌶️',
-    geraet: ['Air Fryer', 'Backofen'],
-    badges: [{cls:'badge-green',txt:'👶 Kinderfreundlich'},{cls:'badge-gold',txt:'⏱ 25 Min'}],
-    marinade: {
-      label: 'Buttermilch (30 Min)',
-      zutaten: [
-        ['Hähnchenstreifen', '500 g'],
-        ['Buttermilch', '200 ml'],
-        ['Salz', '1 TL'],
-        ['Paprikapulver', '½ TL'],
-      ]
-    },
-    zutaten: [
-      ['Panko', '120 g'],
-      ['Mehl', '60 g'],
-      ['Ei', '2 Stück'],
-      ['Knoblauchpulver', '1 TL'],
-      ['Paprikapulver', '1 TL'],
-      ['Zwiebelpulver', '½ TL'],
-      ['Salz & Pfeffer', 'nach Geschmack'],
-    ],
-    schritte: [
-      'Streifen 30 Min in Buttermilch-Marinade einlegen.',
-      'Panierstraße aufbauen: Mehl (gewürzt) → verquirltes Ei → Panko-Mix.',
-      'Streifen nacheinander durch alle drei Stationen ziehen, Panko fest andrücken.',
-      '<strong>Air Fryer:</strong> 200 °C, 14–16 Min, nach 7 Min wenden.',
-      '<strong>Backofen:</strong> 220 °C, 20 Min auf Backpapier, nach 12 Min wenden.',
-      'Heiß servieren mit Honey Mustard, BBQ oder Ranch.',
-    ],
-    tipp: 'Doppelpanade (Mehl → Ei → Panko) macht sie extra knusprig. Leicht mit Rapsöl einsprühen vor dem Air Fryer.',
-  },
-  {
-    emoji: '🔥',
-    title: 'Buffalo Chicken Fingers',
-    sub: 'Franks Hot · Butter-Glaze · Blue Cheese',
-    kategorie: 'fingers',
-    heat: '🌶️🌶️🌶️',
-    geraet: ['Air Fryer', 'Backofen'],
-    badges: [{cls:'badge-fire',txt:'🦬 Buffalo Style'},{cls:'badge-gold',txt:'⏱ 30 Min'}],
-    marinade: {
-      label: 'Buttermilch-Hot (1h)',
-      zutaten: [
-        ['Hähnchenstreifen', '500 g'],
-        ['Buttermilch', '150 ml'],
-        ['Franks Red Hot (oder Tabasco)', '2 EL'],
-        ['Knoblauchpulver', '1 TL'],
-      ]
-    },
-    zutaten: [
-      ['Panko', '100 g'],
-      ['Mehl', '50 g'],
-      ['Ei', '2 Stück'],
-      ['Cayennepfeffer', '½ TL'],
-      ['Paprika scharf', '1 TL'],
-      ['Buffalo-Soße (s.u.)', '5 EL'],
-    ],
-    schritte: [
-      'Hähnchen 1h in Buttermilch-Hot-Marinade einlegen.',
-      'Mehl (mit Paprika + Cayenne), Ei, Panko als Panierstraße aufbauen.',
-      'Panieren und fest andrücken.',
-      '<strong>Air Fryer:</strong> 200 °C, 14–16 Min, wenden nach 8 Min.',
-      '<strong>Backofen:</strong> 220 °C, 20–22 Min.',
-      'Frische Buffalo-Soße erwärmen, fertige Fingers durchschwenken. Mit Blue Cheese Dip servieren.',
-    ],
-    tipp: 'Die Soße erst NACH dem Garen drüber – sonst wird die Panade matschig. Blue Cheese Dip: Frischkäse + Crème fraîche + Blauschimmelkäse + Zitrone.',
-  },
-  {
-    emoji: '🟡',
-    title: 'Parmesan-Herb Chicken Fingers',
-    sub: 'Parmesan · Kräuter · Aioli',
-    kategorie: 'fingers',
-    heat: '🌶️',
-    geraet: ['Air Fryer', 'Backofen'],
-    badges: [{cls:'badge-green',txt:'🌿 Kräuter'},{cls:'badge-gold',txt:'⏱ 20 Min'}],
-    marinade: null,
-    zutaten: [
-      ['Hähnchenstreifen', '400 g'],
-      ['Parmesan (fein gerieben)', '60 g'],
-      ['Panko', '80 g'],
-      ['Getrockneter Oregano', '1 TL'],
-      ['Getrocknetes Basilikum', '½ TL'],
-      ['Knoblauchpulver', '1 TL'],
-      ['Olivenöl', '1 EL'],
-      ['Ei', '2 Stück'],
-      ['Salz & Pfeffer', 'nach Geschmack'],
-    ],
-    schritte: [
-      'Parmesan, Panko, Kräuter und Knoblauchpulver gut mischen.',
-      'Hähnchen in Olivenöl wenden, dann in Ei, dann in Parmesan-Panko-Mix drücken.',
-      '<strong>Air Fryer:</strong> 190 °C, 14–16 Min, wenden nach 8 Min.',
-      '<strong>Backofen:</strong> 210 °C, 20 Min.',
-      'Heiß mit Knoblauch-Aioli oder marinierter Tomatensoße servieren.',
-    ],
-    tipp: 'Parmesan bildet eine goldene Kruste. Nicht zu dick panieren – dünn und gleichmäßig ist besser.',
-  },
-
-  // ── DIPS ──────────────────────────────────────────
+<script>const CRISPY_DIP_HEALTHY = [
+// ── DIPS ──────────────────────────────────────────
   {
     emoji: '🥔',
     title: 'Crispy Air Fryer Fries',
@@ -2777,7 +3009,196 @@ const CRISPY = [
     ],
     tipp: 'Rotkohl enthält Anthocyane – starke Antioxidantien. Tahini liefert Sesamin, das nachweislich LDL senkt und HDL erhöht. Vollkornpita statt Weißmehl für bessere Blutzuckerstabilität.',
   },
+
 ];
+
+
+/* NEW CRISPY DATA - No burgers, 10 Fingers + 10 Wraps + existing dips/healthy */
+
+const CRISPY_FINGERS = [
+{emoji:'🍗',title:'Classic Buffalo Chicken Fingers',sub:'Buttermilch · Cayenne · Franks Hot · Blue Cheese Dip',
+ kategorie:'fingers',heat:'scharf',
+ badges:[{cls:'tr',txt:'🌶️ Scharf'},{cls:'tw',txt:'⏱ 25 Min'}],
+ geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Buttermilch-Hot (1h)',zutaten:[['Hähnchenstreifen','500 g'],['Buttermilch','150 ml'],['Franks Red Hot (oder Tabasco)','2 EL'],['Knoblauchpulver','1 TL']]},
+ zutaten:[['Panko','100 g'],['Mehl','50 g'],['Ei','2 Stück'],['Cayennepfeffer','½ TL'],['Paprika scharf','1 TL'],['Buffalo-Soße (s.u.)','5 EL']],
+ schritte:['Hähnchen 1h in Buttermilch-Hot-Marinade einlegen.','Mehl (mit Paprika + Cayenne), Ei, Panko als Panierstraße aufbauen.','Panieren und fest andrücken.','<strong>Air Fryer:</strong> 200°C, 14–16 Min, wenden nach 8 Min.','<strong>Backofen:</strong> 220°C, 20–22 Min.','Frische Buffalo-Soße erwärmen, fertige Fingers durchschwenken. Mit Blue Cheese Dip servieren.'],
+ tipp:'Die Soße erst NACH dem Garen drüber – sonst wird die Panade matschig. Blue Cheese Dip: Frischkäse + Crème fraîche + Blauschimmelkäse + Zitrone.'},
+
+{emoji:'🧀',title:'Parmesan-Herb Chicken Fingers',sub:'Parmesan · Kräuter · Aioli · Kross',
+ kategorie:'fingers',heat:'mild',
+ badges:[{cls:'tg',txt:'🌿 Kräuter'},{cls:'tw',txt:'⏱ 22 Min'},{cls:'tg',txt:'💚 LDL-ok'}],
+ geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Kräuter-Marinade (30 Min)',zutaten:[['Hähnchenstreifen','500 g'],['Olivenöl','2 EL'],['Knoblauch','2 Zehen'],['Oregano','1 TL'],['Salz & Pfeffer','nach Bedarf']]},
+ zutaten:[['Parmesan (fein)','60 g'],['Panko','80 g'],['Petersilie (gehackt)','2 EL'],['Rosmarin','½ TL'],['Ei','2 Stück']],
+ schritte:['30 Min in Kräuter-Marinade.','Parmesan + Panko + Kräuter mischen.','Hähnchen in Ei wälzen, dann in Parmesan-Panko-Mix. Andrücken.','<strong>Air Fryer:</strong> 190°C, 14 Min, nach 7 Min wenden.','<strong>Backofen:</strong> 210°C, 20 Min.','Mit Knoblauch-Aioli und Zitronenschnitzen servieren.'],
+ tipp:'Parmesan gibt beim Garen eine goldbraune Kruste – kein extra Fett nötig. Feiner Parmesan haftet besser als grob geriebener.'},
+
+{emoji:'🌶️',title:'Nashville Hot Chicken Fingers',sub:'Buttermilch · Nashville Hot Oil · Pickles',
+ kategorie:'fingers',heat:'sehr scharf',
+ badges:[{cls:'tr',txt:'🌶️🌶️🌶️ Sehr Scharf'},{cls:'tw',txt:'⏱ 30 Min'}],
+ geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Buttermilch-Hot (2h)',zutaten:[['Hähnchenstreifen','500 g'],['Buttermilch','200 ml'],['Franks Hot Sauce','3 EL'],['Salz','1 TL'],['Cayenne','1 TL']]},
+ zutaten:[['Mehl','80 g'],['Panko','120 g'],['Ei','3 Stück'],['Rapsöl','4 EL'],['Cayenne','2 TL'],['Smoked Paprika','1 TL'],['Brauner Zucker','1 TL'],['Salz','½ TL'],['Pickles','zum Servieren']],
+ schritte:['2h marinieren – besser über Nacht.','Mehl → Ei → Panko panieren.','<strong>Air Fryer:</strong> 200°C, 16 Min, nach 8 Min wenden.','<strong>Hot Oil:</strong> Rapsöl auf 170°C erhitzen. Gewürze rein, sofort rühren.','Hot Oil über fertige Fingers giessen – NACH dem Garen.','Auf Weißbrot mit Pickles und Cole Slaw servieren.'],
+ tipp:'Hot Oil immer NACH dem Garen – nie vorher. Die Hitze des Öls aktiviert den Cayenne. Für weniger Schärfe: 1 TL Cayenne im Öl statt 2.'},
+
+{emoji:'🍯',title:'Honey Garlic Chicken Fingers',sub:'Honig · Knoblauch · Sojasoße · Sticky Glaze',
+ kategorie:'fingers',heat:'mild',
+ badges:[{cls:'ty',txt:'🍯 Sticky'},{cls:'tw',txt:'⏱ 22 Min'},{cls:'tg',txt:'💚 LDL-ok'}],
+ geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Soja-Honig-Marinade (30 Min)',zutaten:[['Hähnchenstreifen','500 g'],['Sojasoße','2 EL'],['Knoblauch','3 Zehen'],['Ingwer','1 TL'],['Honig','1 EL']]},
+ zutaten:[['Panko','100 g'],['Mehl','40 g'],['Ei','2 Stück'],['Honig','3 EL'],['Sojasoße','2 EL'],['Knoblauch (gehackt)','4 Zehen'],['Butter','15 g'],['Sesam','1 EL']],
+ schritte:['30 Min marinieren.','Mehl → Ei → Panko panieren.','<strong>Air Fryer:</strong> 200°C, 14 Min, nach 7 Min wenden.','Honey Garlic Sauce: Butter schmelzen, Knoblauch 1 Min anbraten, Honig + Sojasoße rein.','Fertige Fingers in Sauce schwenken.','Sesam + Frühlingszwiebeln drüber.'],
+ tipp:'Sauce erst am Ende – sonst verbrennt der Honig. Sticky Glaze haftet besser wenn Fingers direkt aus dem Fryer kommen.'},
+
+{emoji:'🧄',title:'Korean Spicy Chicken Fingers',sub:'Gochujang · Doppelpaniert · Sesamöl',
+ kategorie:'fingers',heat:'mittel',
+ badges:[{cls:'tr',txt:'🇰🇷 Korean'},{cls:'tw',txt:'⏱ 25 Min'}],
+ geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Korean-Marinade (1h)',zutaten:[['Hähnchenstreifen','500 g'],['Sojasoße','2 EL'],['Sesamöl','1 TL'],['Knoblauch','3 Zehen'],['Ingwer','1 TL'],['Reisessig','1 EL']]},
+ zutaten:[['Speisestärke','60 g'],['Panko','80 g'],['Ei','2 Stück'],['Gochujang','3 EL'],['Honig','2 EL'],['Sojasoße','1 EL'],['Sesam','2 TL']],
+ schritte:['1h marinieren.','Speisestärke → Ei → Panko (Doppelpanade: nochmals Ei → Panko).','<strong>Air Fryer Doppelrunde:</strong> 180°C 10 Min, Pause, 200°C 8 Min.','Gochujang + Honig + Sojasoße warm machen.','Fingers in Sauce schwenken.','Sesam + Frühlingszwiebeln.'],
+ tipp:'Doppelpanade ist das Korea-Geheimnis: extra knusprig und hält mehr Sauce. Die Pause zwischen den Runden gibt Feuchtigkeit ab.'},
+
+{emoji:'🌿',title:'Greek Chicken Fingers',sub:'Tzatziki · Zitrone · Oregano · Mediterranean',
+ kategorie:'fingers',heat:'mild',
+ badges:[{cls:'tg',txt:'🇬🇷 Mediterran'},{cls:'tw',txt:'⏱ 22 Min'},{cls:'tg',txt:'💚 LDL-ok'}],
+ geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Joghurt-Marinade (1h)',zutaten:[['Hähnchenstreifen','500 g'],['Joghurt 0%','100 g'],['Zitronensaft','2 EL'],['Oregano','1 TL'],['Knoblauch','2 Zehen'],['Salz','1 TL']]},
+ zutaten:[['Panko','80 g'],['Paniermehl','40 g'],['Ei','2 Stück'],['Oregano','1 TL'],['Zitronenabrieb','1 Zitrone'],['Tzatziki','zum Dippen']],
+ schritte:['1h in Joghurt-Marinade einlegen – macht Fleisch extra zart.','Panko + Paniermehl + Oregano + Zitronenabrieb mischen.','Mehl → Ei → Kräuter-Panko.','<strong>Air Fryer:</strong> 190°C, 14 Min, nach 7 Min wenden.','Mit Tzatziki, Pitabrot und Tomaten servieren.','Frische Zitrone drüber pressen.'],
+ tipp:'Joghurt-Marinade ist die gesündeste und macht das Fleisch besonders zart durch Milchsäure. Bis zu 24h marinieren für bestes Ergebnis.'},
+
+{emoji:'🫙',title:'Tandoori Chicken Fingers',sub:'Joghurt · Tandoori-Gewürze · Mango-Chutney',
+ kategorie:'fingers',heat:'mittel',
+ badges:[{cls:'ta',txt:'🇮🇳 Indisch'},{cls:'tw',txt:'⏱ 25 Min'},{cls:'tg',txt:'💚 LDL-ok'}],
+ geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Tandoori-Marinade (2h)',zutaten:[['Hähnchenstreifen','500 g'],['Joghurt 0%','120 g'],['Paprikapulver','2 TL'],['Kreuzkümmel','1 TL'],['Koriander gemahlen','1 TL'],['Kurkuma','½ TL'],['Cayenne','½ TL'],['Knoblauch','3 Zehen'],['Ingwer','1 TL'],['Zitronensaft','1 EL']]},
+ zutaten:[['Panko','80 g'],['Ei','2 Stück'],['Paprikapulver','1 TL'],['Mango-Chutney','zum Dippen'],['Koriander frisch','nach Bedarf']],
+ schritte:['2h marinieren (besser über Nacht).','Fingers abtupfen, in Ei, dann in Paprika-Panko.','<strong>Air Fryer:</strong> 200°C, 15 Min, nach 8 Min wenden.','<strong>Backofen:</strong> 220°C, 22 Min.','Mit Mango-Chutney und frischem Koriander servieren.','Optional: rote Lebensmittelfarbe für authentische Tandoori-Farbe.'],
+ tipp:'Je länger die Tandoori-Marinade, desto intensiver das Aroma. Über Nacht = Restaurant-Qualität. Joghurt neutralisiert die Schärfe.'},
+
+{emoji:'🍋',title:'Lemon Pepper Chicken Fingers',sub:'Zitrone · Pfeffer · Butter-Glaze · Kross',
+ kategorie:'fingers',heat:'mild',
+ badges:[{cls:'ty',txt:'🍋 Zitrone'},{cls:'tw',txt:'⏱ 20 Min'},{cls:'tg',txt:'💚 LDL-ok'}],
+ geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Zitrus-Marinade (30 Min)',zutaten:[['Hähnchenstreifen','500 g'],['Zitronensaft','2 EL'],['Zitronenabrieb','1 Zitrone'],['Olivenöl','2 EL'],['Schwarzer Pfeffer grob','2 TL'],['Salz','1 TL']]},
+ zutaten:[['Panko','100 g'],['Mehl','50 g'],['Ei','2 Stück'],['Zitronenabrieb','1 Zitrone'],['Schwarzer Pfeffer grob','2 TL'],['Butter','20 g'],['Petersilie','2 EL']],
+ schritte:['30 Min marinieren.','Panko + Zitronenabrieb + grober Pfeffer mischen.','Mehl → Ei → Zitrons-Panko.','<strong>Air Fryer:</strong> 200°C, 14 Min, nach 7 Min wenden.','Butter schmelzen, Zitronenabrieb + Pfeffer rein.','Fingers in Butter-Glaze wälzen. Petersilie drüber.'],
+ tipp:'Frischer Zitronenabrieb gibt 10× mehr Aroma als Saft. In die Panade UND in die Glaze – doppeltes Zitronen-Erlebnis.'},
+
+{emoji:'🥓',title:'Bacon-Wrapped Chicken Fingers',sub:'Schweinebauch · Maple-Syrup · Smoky',
+ kategorie:'fingers',heat:'mild',
+ badges:[{cls:'tw',txt:'🥓 Bacon'},{cls:'tw',txt:'⏱ 28 Min'},{cls:'ty',txt:'Maple'}],
+ geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Maple-Marinade (30 Min)',zutaten:[['Hähnchenstreifen','500 g'],['Ahornsirup','2 EL'],['Dijon-Senf','1 EL'],['Smoked Paprika','1 TL'],['Knoblauch','2 Zehen']]},
+ zutaten:[['Frühstücksspeck (dünn)','10 Scheiben'],['Ahornsirup','2 EL'],['Schwarzer Pfeffer','nach Bedarf'],['Zahnstocher','zum Fixieren']],
+ schritte:['Fingers 30 Min in Maple-Marinade.','Jeden Finger mit einer Speckscheibe umwickeln, mit Zahnstocher fixieren.','<strong>Air Fryer:</strong> 200°C, 18–20 Min, nach 10 Min wenden.','Letzten 3 Min: Ahornsirup drüber pinseln.','<strong>Backofen:</strong> 220°C, 25 Min.','Sofort servieren – Speck wird beim Abkühlen weich.'],
+ tipp:'Speck dünn aufschneiden damit er in der gleichen Zeit gar wird wie das Hähnchen. Ahornsirup ganz am Ende – verbrennt sonst.'},
+
+{emoji:'🌰',title:'Haselnuss-Sesam Chicken Fingers',sub:'Haselnüsse · Sesam · Honig-Senf · Nussig',
+ kategorie:'fingers',heat:'mild',
+ badges:[{cls:'ty',txt:'🌰 Nussig'},{cls:'tw',txt:'⏱ 22 Min'},{cls:'tg',txt:'💚 Gut'}],
+ geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Honig-Senf-Marinade (30 Min)',zutaten:[['Hähnchenstreifen','500 g'],['Dijon-Senf','2 EL'],['Honig','1 EL'],['Olivenöl','1 EL'],['Salz','½ TL']]},
+ zutaten:[['Haselnüsse (fein gehackt)','60 g'],['Sesam','40 g'],['Panko','40 g'],['Ei','2 Stück'],['Honig-Senf-Dip','zum Servieren']],
+ schritte:['30 Min marinieren.','Haselnüsse + Sesam + Panko mischen.','Fingers in Ei, dann in Nuss-Sesam-Mix andrücken.','<strong>Air Fryer:</strong> 190°C, 14 Min, nach 7 Min wenden.','<strong>Backofen:</strong> 200°C, 20 Min.','Mit Honig-Senf-Dip servieren.'],
+ tipp:'Nüsse fein hacken – grobe Stücke fallen ab. Im AF werden sie goldbraun ohne extra Fett. Glutenfrei wenn Panko durch mehr Nüsse ersetzt.'},
+];
+
+const CRISPY_WRAPS = [
+{emoji:'🌯',title:'Classic Crispy Chicken Wrap',sub:'Buttermilch · Caesar · Romaine · Parmesan',
+ kategorie:'wrap',heat:'mild',
+ badges:[{cls:'tw',txt:'🇺🇸 Klassiker'},{cls:'tw',txt:'⏱ 25 Min'}],
+ geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Buttermilch-Marinade (1h)',zutaten:[['Hähnchenbrust','400 g'],['Buttermilch','200 ml'],['Knoblauchpulver','1 TL'],['Paprika','1 TL'],['Salz','1 TL']]},
+ zutaten:[['Panko','100 g'],['Mehl','50 g'],['Ei','2 Stück'],['Große Tortillas','4'],['Romain-Salat','1 Kopf'],['Parmesan','40 g'],['Caesar-Dressing','4 EL'],['Tomaten','2']],
+ schritte:['1h marinieren.','Panieren: Mehl → Ei → Panko.','<strong>Air Fryer:</strong> 200°C, 14 Min, nach 7 Min wenden.','Hähnchen in Streifen schneiden.','Wrap belegen: Salat + Tomaten + Hähnchen + Parmesan + Caesar.','Fest einrollen, in der Mitte halbieren.'],
+ tipp:'Wrap fest einrollen und kurz auf der Nahtseite in den heissen AF – 2 Min. Gibt Röstaroma und der Wrap hält besser.'},
+
+{emoji:'🌯',title:'Spicy Buffalo Chicken Wrap',sub:'Buffalo-Sauce · Ranch · Sellerie · Würzig',
+ kategorie:'wrap',heat:'scharf',
+ badges:[{cls:'tr',txt:'🌶️ Scharf'},{cls:'tw',txt:'⏱ 25 Min'}],
+ geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Buttermilch-Hot (1h)',zutaten:[['Hähnchenbrust','400 g'],['Buttermilch','200 ml'],['Franks Hot Sauce','3 EL'],['Cayenne','½ TL']]},
+ zutaten:[['Panko','100 g'],['Mehl','50 g'],['Ei','2 Stück'],['Tortillas','4'],['Eisberg-Salat','½ Kopf'],['Sellerie','3 Stangen'],['Ranch-Dressing','4 EL'],['Franks Hot Sauce','3 EL']],
+ schritte:['1h marinieren.','Panieren und im AF bei 200°C, 14 Min garen.','Hähnchen in Streifen, in Buffalo-Sauce schwenken.','Tortilla belegen: Ranch + Salat + Sellerie + Buffalo-Hähnchen.','Fest einrollen. Optional: kurz in Pfanne anrösten.','Sofort mit extra Ranch und Hot Sauce servieren.'],
+ tipp:'Sellerie ist kein Gimmick – die Frische und der Knack balancieren die fettige Schärfe perfekt. Ranch-Dressing als Basis ist Pflicht.'},
+
+{emoji:'🌯',title:'Korean Chicken Wrap',sub:'Gochujang-Hähnchen · Kimchi · Sesam · Ssam-Style',
+ kategorie:'wrap',heat:'mittel',
+ badges:[{cls:'tr',txt:'🇰🇷 Korean'},{cls:'tw',txt:'⏱ 28 Min'}],
+ geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Korean-Marinade (1h)',zutaten:[['Hähnchenbrust','400 g'],['Sojasoße','3 EL'],['Gochujang','2 EL'],['Sesam öl','1 TL'],['Knoblauch','3 Zehen'],['Ingwer','1 TL'],['Honig','1 EL']]},
+ zutaten:[['Speisestärke','60 g'],['Panko','60 g'],['Ei','2 Stück'],['Tortillas','4'],['Kimchi','100 g'],['Gurke','1'],['Karotten (geraspelt)','1'],['Sesam','1 EL'],['Kewpie Mayo','3 EL']],
+ schritte:['1h marinieren.','Speisestärke → Ei → Panko (extra crispy!).','AF: 190°C, 14 Min, Pause, 200°C 6 Min.','Hähnchen in Scheiben schneiden.','Wrap: Kewpie + Kimchi + Karotten + Gurke + Hähnchen + Sesam.','Mit Ssam-Sauce extra servieren.'],
+ tipp:'Doppelrunde im AF gibt koreanische Knusprigkeit. Kimchi ausdrücken damit der Wrap nicht nass wird. Kewpie ist cremiger als normale Mayo.'},
+
+{emoji:'🌯',title:'Mediterranean Chicken Wrap',sub:'Tzatziki · Feta · Oliven · Spinat · Griechisch',
+ kategorie:'wrap',heat:'mild',
+ badges:[{cls:'tg',txt:'🇬🇷 Mediterran'},{cls:'tw',txt:'⏱ 25 Min'},{cls:'tg',txt:'💚 LDL-ok'}],
+ geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Joghurt-Marinade (1h)',zutaten:[['Hähnchenbrust','400 g'],['Joghurt 0%','100 g'],['Zitronensaft','2 EL'],['Oregano','1 TL'],['Knoblauch','2 Zehen']]},
+ zutaten:[['Panko','80 g'],['Paniermehl','40 g'],['Ei','2 Stück'],['Tortillas','4'],['Babyspinat','80 g'],['Feta','80 g'],['Kalamata-Oliven','50 g'],['Tomaten','2'],['Tzatziki','4 EL']],
+ schritte:['1h marinieren.','Kräuter-Panko panieren. AF: 190°C, 14 Min.','Hähnchen in Streifen schneiden.','Wrap: Tzatziki + Spinat + Tomaten + Oliven + Hähnchen + Feta.','Fest einrollen.','Mit extra Tzatziki und Zitronenschnitzen servieren.'],
+ tipp:'Joghurt-mariniertes Hähnchen bleibt auch im Wrap saftig. Feta erst ganz oben – sonst bröckelt er auseinander und macht alles sperrig.'},
+
+{emoji:'🌯',title:'Honey Mustard Chicken Wrap',sub:'Honig-Senf · Rucola · Gouda · Süss-Würzig',
+ kategorie:'wrap',heat:'mild',
+ badges:[{cls:'ty',txt:'🍯 Süss-Würzig'},{cls:'tw',txt:'⏱ 22 Min'}],
+ geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Senf-Marinade (30 Min)',zutaten:[['Hähnchenbrust','400 g'],['Dijon-Senf','2 EL'],['Honig','1 EL'],['Apfelessig','1 EL'],['Salz','½ TL']]},
+ zutaten:[['Panko','100 g'],['Mehl','40 g'],['Ei','2 Stück'],['Tortillas','4'],['Rucola','60 g'],['Gouda (gerieben)','80 g'],['Rote Zwiebel','1'],['Honey-Mustard-Sauce','4 EL']],
+ schritte:['30 Min marinieren.','Panieren: Mehl → Ei → Panko.','AF: 200°C, 14 Min, nach 7 Min wenden.','Hähnchen in Streifen schneiden.','Wrap: Honey Mustard + Rucola + Zwiebel + Hähnchen + Gouda.','Einrollen und diagonal halbieren.'],
+ tipp:'Rote Zwiebeln 10 Min in Eiswasser legen – werden milder und knackig. Gouda schmilzt leicht durch die Wärme des frischen Hähnchens.'},
+
+{emoji:'🌯',title:'Teriyaki Chicken Wrap',sub:'Teriyaki-Glasur · Avocado · Karotten · Japan-Style',
+ kategorie:'wrap',heat:'mild',
+ badges:[{cls:'tb',txt:'🇯🇵 Teriyaki'},{cls:'tw',txt:'⏱ 25 Min'},{cls:'tg',txt:'💚 LDL-ok'}],
+ geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Teriyaki-Marinade (1h)',zutaten:[['Hähnchenbrust','400 g'],['Sojasoße','3 EL'],['Mirin','3 EL'],['Sake','2 EL'],['Honig','1 EL'],['Ingwer','1 TL']]},
+ zutaten:[['Speisestärke','60 g'],['Ei','2 Stück'],['Tortillas','4'],['Avocado','2'],['Karotten geraspelt','2'],['Gurke','1'],['Sesam','1 EL'],['Kewpie Mayo','3 EL']],
+ schritte:['1h marinieren. Marinade aufbewahren!','Stärke → Ei (kein Panko – crispy durch Stärke).','AF: 190°C, 14 Min.','Marinade einkochen bis sirupartig (3 Min) – Teriyaki-Glaze.','Wrap: Kewpie + Avocado + Karotten + Gurke + Hähnchen + Glaze.','Sesam drüber.'],
+ tipp:'Teriyaki-Glaze aus der Restmarinade ist Game-Changer. Avocado gibt Cremigkeit die Kewpie alleine nicht schafft. Wrap gut einrollen – die Füllung ist üppig!'},
+
+{emoji:'🌯',title:'Chipotle Smoky Chicken Wrap',sub:'Chipotle · Schwarze Bohnen · Mais · Mexikanisch',
+ kategorie:'wrap',heat:'mittel',
+ badges:[{cls:'tr',txt:'🇲🇽 Mexiko'},{cls:'tw',txt:'⏱ 25 Min'}],
+ geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Chipotle-Marinade (1h)',zutaten:[['Hähnchenbrust','400 g'],['Chipotle in Adobo (püriert)','2 EL'],['Limettensaft','2 EL'],['Kreuzkümmel','1 TL'],['Knoblauch','2 Zehen'],['Paprika','1 TL']]},
+ zutaten:[['Panko','100 g'],['Mehl','50 g'],['Ei','2 Stück'],['Tortillas','4'],['Schwarze Bohnen','1 Dose'],['Mais','1 Dose'],['Cheddar gerieben','80 g'],['Salsa','4 EL'],['Saure Sahne','4 EL']],
+ schritte:['1h marinieren.','Panieren: Mehl → Ei → Panko.','AF: 200°C, 14 Min.','Bohnen und Mais abtropfen, in Pfanne kurz anbraten.','Wrap: Saure Sahne + Salsa + Bohnen-Mais + Hähnchen + Cheddar.','Fest einrollen. Optional: in Folie wickeln und 2 Min ruhen.'],
+ tipp:'Chipotle in Adobo gibt echten Rauchgeschmack. Bohnen und Mais vorher anbraten für Röstaroma. Wrap in Folie gewickelt hält alles zusammen.'},
+
+{emoji:'🌯',title:'Caesar Crunch Wrap',sub:'Parmesan-Panko · Caesar · Grissini · Extra Crispy',
+ kategorie:'wrap',heat:'mild',
+ badges:[{cls:'tw',txt:'⭐ Extra Crispy'},{cls:'tw',txt:'⏱ 25 Min'}],
+ geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Caesar-Marinade (30 Min)',zutaten:[['Hähnchenbrust','400 g'],['Caesar-Dressing','3 EL'],['Parmesan','2 EL'],['Knoblauchpulver','½ TL']]},
+ zutaten:[['Parmesan (fein)','50 g'],['Panko','70 g'],['Ei','2 Stück'],['Tortillas (groß)','4'],['Romain','1 Kopf'],['Parmesan-Hobelspäne','nach Bedarf'],['Croutons','50 g'],['Caesar-Dressing','5 EL']],
+ schritte:['30 Min marinieren.','Parmesan + Panko → Ei → Parmesan-Panko.','AF: 190°C, 14 Min – extra knusprig!','Hähnchen in Streifen.','Wrap: Caesar + Romain + Croutons + Hähnchen + Parmesan-Hobelspäne.','Fest einrollen.'],
+ tipp:'Croutons in den Wrap geben extra Crunch – aber erst direkt vor dem Einrollen sonst werden sie weich. Parmesan doppelt: in Panade UND als Topping.'},
+
+{emoji:'🌯',title:'Tandoori Chicken Wrap',sub:'Joghurt · Tandoori · Mango-Chutney · Minze',
+ kategorie:'wrap',heat:'mittel',
+ badges:[{cls:'ta',txt:'🇮🇳 Indisch'},{cls:'tw',txt:'⏱ 28 Min'},{cls:'tg',txt:'💚 LDL-ok'}],
+ geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Tandoori-Marinade (2h)',zutaten:[['Hähnchenbrust','400 g'],['Joghurt 0%','120 g'],['Paprikapulver','2 TL'],['Kreuzkümmel','1 TL'],['Kurkuma','½ TL'],['Cayenne','½ TL'],['Knoblauch','3 Zehen'],['Ingwer','1 TL']]},
+ zutaten:[['Ei','2 Stück'],['Panko','80 g'],['Rotes Mehl oder normale','50 g'],['Fladenbrote oder Naan','4'],['Salat','80 g'],['Tomaten','2'],['Rote Zwiebel','1'],['Mango-Chutney','4 EL'],['Minze frisch','2 EL'],['Joghurt 0%','4 EL']],
+ schritte:['2h (besser: über Nacht) marinieren.','Panieren: Mehl → Ei → Panko.','AF: 200°C, 15 Min.','Hähnchen in Streifen schneiden.','Wrap/Naan: Joghurt + Chutney + Salat + Tomaten + Zwiebel + Hähnchen + Minze.','Einrollen oder als offenen Wrap servieren.'],
+ tipp:'Naan statt Tortilla gibt authentischen indischen Charakter. Mango-Chutney + Joghurt als Doppel-Sauce ist die beste Kombination. Minze ist Pflicht!'},
+
+{emoji:'🌯',title:'Ranch Bacon Chicken Wrap',sub:'Knuspriger Speck · Ranch · Avocado · Cheddar',
+ kategorie:'wrap',heat:'mild',
+ badges:[{cls:'tw',txt:'🥓 Bacon'},{cls:'tw',txt:'⏱ 28 Min'}],
+ geraet:['Air Fryer','Backofen'],
+ marinade:{label:'Ranch-Marinade (30 Min)',zutaten:[['Hähnchenbrust','400 g'],['Ranch-Dressing','3 EL'],['Knoblauchpulver','½ TL'],['Zwiebelpulver','½ TL'],['Salz','½ TL']]},
+ zutaten:[['Panko','100 g'],['Mehl','40 g'],['Ei','2 Stück'],['Tortillas','4'],['Frühstücksspeck','6 Scheiben'],['Avocado','2'],['Cheddar gerieben','80 g'],['Eisberg','½ Kopf'],['Ranch-Dressing','4 EL'],['Tomaten','2']],
+ schritte:['30 Min marinieren.','Panieren: Mehl → Ei → Panko.','AF: 200°C, 14 Min.','Speck auf Platte oder in Pfanne kross braten.','Wrap: Ranch + Eisberg + Tomaten + Avocado + Hähnchen + Speck + Cheddar.','Einrollen. Mit extra Ranch und Hot Sauce servieren.'],
+ tipp:'Cheddar auf das noch warme Hähnchen legen – schmilzt leicht. Speck kross braten und auf Küchenpapier abtropfen damit der Wrap nicht fettig wird.'},
+];
+
 const CRISPY_SOSSEN = [
   // ── KLASSIKER ──────────────────────────────────
   {
@@ -3046,6 +3467,18 @@ const CRISPY_SOSSEN = [
     ]
   },
 ];
+
+
+// Merge CRISPY_FINGERS + CRISPY_WRAPS into CRISPY array
+var CRISPY = [];
+(function() {
+  for (var i = 0; i < CRISPY_FINGERS.length; i++) CRISPY.push(CRISPY_FINGERS[i]);
+  for (var i = 0; i < CRISPY_WRAPS.length; i++) CRISPY.push(CRISPY_WRAPS[i]);
+  if (typeof CRISPY_DIP_HEALTHY !== 'undefined') {
+    for (var i = 0; i < CRISPY_DIP_HEALTHY.length; i++) CRISPY.push(CRISPY_DIP_HEALTHY[i]);
+  }
+})();
+
 </script>
 
 <script>
@@ -5321,6 +5754,266 @@ function init() {
 }
 
 init();
+</script>
+
+<script>
+/* ═══════════ WOCHENPLAN ═══════════ */
+var WP = {};          // {dayIdx: recipeObj}
+var WP_POR = {};      // {dayIdx: portions}
+var WP_TARGET = null;
+var WP_SEC = 'alle';
+var WP_Q = '';
+var WP_CHECKED = {};
+
+var WP_DAYS = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'];
+var WP_COLORS = {blitz:'var(--blitz)',burger:'var(--burger)',crispy:'var(--crispy)',curry:'var(--curry)',auf:'var(--auf)'};
+var WP_LABELS = {blitz:'Blitz',burger:'Burger',crispy:'Crispy',curry:'Curry',auf:'Aufstrich'};
+
+function wpSave() {
+  try {
+    localStorage.setItem('wp3', JSON.stringify(WP));
+    localStorage.setItem('wp3p', JSON.stringify(WP_POR));
+    localStorage.setItem('wpc3', JSON.stringify(WP_CHECKED));
+  } catch(e) {}
+}
+function wpLoad() {
+  try {
+    var p = localStorage.getItem('wp3'); if (p) WP = JSON.parse(p);
+    var pp = localStorage.getItem('wp3p'); if (pp) WP_POR = JSON.parse(pp);
+    var x = localStorage.getItem('wpc3'); if (x) WP_CHECKED = JSON.parse(x);
+  } catch(e) {}
+}
+
+function getAllRec() {
+  var out = [];
+  function add(sec, arr, getIco, getZut) {
+    if (!arr) return;
+    for (var i = 0; i < arr.length; i++) {
+      var r = arr[i];
+      out.push({sec:sec, ico:getIco(r), title:r.title||'', sub:r.sub||'', zutaten:getZut(r), key:sec+'_'+i});
+    }
+  }
+  add('blitz',  typeof BLITZ!='undefined'?BLITZ:null,   function(r){return r.ico||'⚡';},   function(r){return r.zut||[];});
+  add('burger', typeof BURGER!='undefined'?BURGER:null,  function(r){return r.icon||'🍔';},  function(r){return r.zut||[];});
+  add('crispy', typeof CRISPY!='undefined'?CRISPY:null,  function(r){return r.emoji||'🍗';}, function(r){return r.zutaten||[];});
+  add('curry',  typeof CURRY!='undefined'?CURRY:null,    function(r){return r.emoji||'🍛';}, function(r){return r.zutaten||[];});
+  add('auf',    typeof AUF!='undefined'?AUF:null,         function(r){return r.emoji||'🥪';}, function(r){return r.zutaten||[];});
+  return out;
+}
+
+/* ── PORTIONS ─────────────────────────────────────── */
+function wpChangePor(d, delta) {
+  var cur = WP_POR[d] || 2;
+  cur = Math.max(1, Math.min(12, cur + delta));
+  WP_POR[d] = cur;
+  var el = document.getElementById('wpporval-' + d);
+  if (el) el.textContent = cur;
+  wpSave();
+}
+
+/* ── RENDER ───────────────────────────────────────── */
+function renderPlan() {
+  for (var d = 0; d < 7; d++) {
+    var r = WP[d] || null;
+    var dayEl = document.getElementById('wpday-' + d);
+    var recEl = document.getElementById('wpr-' + d);
+    var addBtn = document.getElementById('wpbtn-' + d);
+    var porRow = document.getElementById('wpor-' + d);
+    var porVal = document.getElementById('wpporval-' + d);
+    if (!recEl) continue;
+    // Restore saved portions
+    var por = WP_POR[d] || 2;
+    if (porVal) porVal.textContent = por;
+    if (r) {
+      var col = WP_COLORS[r.sec] || 'var(--tipps)';
+      var lbl = WP_LABELS[r.sec] || r.sec;
+      recEl.innerHTML = '<div class="wp-recipe-pill">'
+        + '<span class="wp-recipe-pill-ico">' + r.ico + '</span>'
+        + '<span class="wp-recipe-pill-title">' + r.title + '</span>'
+        + '<span class="wp-recipe-pill-sec" style="background:' + col + '22;color:' + col + ';border:1px solid ' + col + '33">' + lbl + '</span>'
+        + '<div class="wp-del-btn" onclick="wpRemove(' + d + ')">×</div>'
+        + '</div>';
+      if (addBtn) addBtn.style.display = 'none';
+      if (porRow) porRow.classList.remove('hidden');
+      if (dayEl) dayEl.classList.add('has-meal');
+    } else {
+      recEl.innerHTML = '<div class="wp-slot-empty">Nichts geplant</div>';
+      if (addBtn) addBtn.style.display = '';
+      if (porRow) porRow.classList.add('hidden');
+      if (dayEl) dayEl.classList.remove('has-meal');
+    }
+  }
+}
+
+function wpRemove(d) {
+  delete WP[d];
+  wpSave();
+  renderPlan();
+}
+function clearPlan() {
+  if (!confirm('Plan wirklich leeren?')) return;
+  WP = {}; WP_POR = {}; WP_CHECKED = {};
+  wpSave(); renderPlan();
+}
+
+/* ── PICKER ───────────────────────────────────────── */
+function openPicker(d) {
+  WP_TARGET = d; WP_SEC = 'alle'; WP_Q = '';
+  var s = document.getElementById('wp-search'); if (s) s.value = '';
+  var tabs = document.querySelectorAll('.wp-sec-tab');
+  for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('on');
+  if (tabs[0]) tabs[0].classList.add('on');
+  var title = document.getElementById('picker-title');
+  if (title) title.textContent = WP_DAYS[d] + ' – Rezept wählen';
+  var modal = document.getElementById('wp-picker');
+  if (modal) modal.classList.remove('hidden');
+  renderPickerList();
+}
+function closePicker(evt) {
+  if (evt && evt.target && evt.target.id !== 'wp-picker') return;
+  var m = document.getElementById('wp-picker'); if (m) m.classList.add('hidden');
+}
+function setPickerSec(sec, btn) {
+  WP_SEC = sec;
+  var tabs = document.querySelectorAll('.wp-sec-tab');
+  for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('on');
+  btn.classList.add('on');
+  renderPickerList();
+}
+function filterPicker(q) { WP_Q = q.toLowerCase().trim(); renderPickerList(); }
+function renderPickerList() {
+  var list = document.getElementById('wp-recipe-list');
+  if (!list) return;
+  var all = getAllRec();
+  var filtered = [];
+  for (var i = 0; i < all.length; i++) {
+    var r = all[i];
+    if (WP_SEC !== 'alle' && r.sec !== WP_SEC) continue;
+    if (WP_Q && r.title.toLowerCase().indexOf(WP_Q) < 0 && r.sub.toLowerCase().indexOf(WP_Q) < 0) continue;
+    filtered.push(r);
+  }
+  if (!filtered.length) { list.innerHTML = '<div class="empty">Kein Rezept gefunden.</div>'; return; }
+  var html = '';
+  for (var i = 0; i < filtered.length; i++) {
+    var r = filtered[i];
+    var col = WP_COLORS[r.sec] || 'var(--tipps)';
+    var lbl = WP_LABELS[r.sec] || r.sec;
+    html += '<div class="wp-recipe-item" onclick="wpPick(\'' + r.key + '\')">'
+      + '<div class="wp-recipe-item-ico">' + r.ico + '</div>'
+      + '<div class="wp-recipe-item-inf"><div class="wp-recipe-item-title">' + r.title + '</div>'
+      + '<div class="wp-recipe-item-sub">' + r.sub + '</div></div>'
+      + '<span class="wp-recipe-item-sec" style="background:' + col + '22;color:' + col + ';border:1px solid ' + col + '33">' + lbl + '</span>'
+      + '</div>';
+  }
+  list.innerHTML = html;
+}
+function wpPick(key) {
+  if (WP_TARGET === null) return;
+  var all = getAllRec();
+  var rec = null;
+  for (var i = 0; i < all.length; i++) { if (all[i].key === key) { rec = all[i]; break; } }
+  if (!rec) return;
+  WP[WP_TARGET] = rec;
+  if (!WP_POR[WP_TARGET]) WP_POR[WP_TARGET] = 2;
+  wpSave();
+  var m = document.getElementById('wp-picker'); if (m) m.classList.add('hidden');
+  WP_TARGET = null;
+  renderPlan();
+}
+
+/* ── SHOPPING LIST with portions ──────────────────── */
+function showShoppingList() {
+  var entries = [];
+  for (var d = 0; d < 7; d++) {
+    if (WP[d]) entries.push({rec: WP[d], por: WP_POR[d] || 2, day: WP_DAYS[d]});
+  }
+  if (!entries.length) { alert('Keine Rezepte im Plan!'); return; }
+
+  // Collect ingredients scaled by portions (base = 2)
+  var ing = {};
+  for (var ei = 0; ei < entries.length; ei++) {
+    var e = entries[ei];
+    var ratio = e.por / 2;
+    var zut = e.rec.zutaten || [];
+    for (var zi = 0; zi < zut.length; zi++) {
+      if (!zut[zi] || !zut[zi][0]) continue;
+      var name = zut[zi][0].toString().trim();
+      var rawAmt = zut[zi][1] ? zut[zi][1].toString().trim() : '';
+      // Skip vague amounts
+      if (rawAmt.toLowerCase().indexOf('bedarf') >= 0 ||
+          rawAmt.toLowerCase().indexOf('geschmack') >= 0 ||
+          rawAmt.toLowerCase().indexOf('belieben') >= 0) {
+        rawAmt = 'n. B.';
+      } else if (ratio !== 1) {
+        // Try to scale numeric part
+        var m2 = rawAmt.match(/^([0-9]+(?:[.,][0-9]+)?)\s*(.*)/);
+        if (m2) {
+          var n = parseFloat(m2[1].replace(',','.'));
+          var scaled = Math.round(n * ratio * 10) / 10;
+          var unit = m2[2] || '';
+          rawAmt = (scaled === Math.floor(scaled) ? scaled : scaled.toFixed(1)) + (unit ? ' ' + unit : '');
+        }
+      }
+      var key = name.toLowerCase();
+      if (!ing[key]) ing[key] = {name:name, amts:[], days:[]};
+      if (rawAmt && ing[key].amts.indexOf(rawAmt) < 0) ing[key].amts.push(rawAmt);
+      if (ing[key].days.indexOf(e.day) < 0) ing[key].days.push(e.day);
+    }
+  }
+
+  // Header with days summary
+  var summary = entries.map(function(e){
+    return '<span style="background:rgba(100,210,255,.1);border:1px solid rgba(100,210,255,.2);border-radius:6px;padding:2px 7px;font-size:.6rem;color:var(--tipps);font-weight:700">'
+      + e.day.substring(0,2) + ' (' + e.por + '×) ' + e.rec.ico + '</span>';
+  }).join(' ');
+
+  var keys = Object.keys(ing).sort();
+  var html = '<div style="padding:8px 0 10px;display:flex;flex-wrap:wrap;gap:4px">' + summary + '</div>';
+  html += '<div style="border-top:1px solid var(--bdr);padding-top:4px"></div>';
+
+  for (var i = 0; i < keys.length; i++) {
+    var item = ing[keys[i]];
+    var isChecked = WP_CHECKED[item.name];
+    var cc = isChecked ? ' checked' : '';
+    var sym = isChecked ? '✓' : '';
+    html += '<div class="wp-shop-item' + cc + '" onclick="wpToggleShop(this,\'' + item.name.replace(/['"\\]/g,'') + '\')">'
+      + '<div class="wp-check">' + sym + '</div>'
+      + '<div class="wp-ing">' + item.name + '</div>'
+      + '<div class="wp-ing-amt">' + item.amts.join(' · ') + '</div>'
+      + '</div>';
+  }
+  var list = document.getElementById('wp-shop-list'); if (list) list.innerHTML = html;
+  var m = document.getElementById('wp-shopmodal'); if (m) m.classList.remove('hidden');
+}
+
+function wpToggleShop(el, name) {
+  el.classList.toggle('checked');
+  var ch = el.querySelector('.wp-check');
+  if (el.classList.contains('checked')) { WP_CHECKED[name] = 1; if (ch) ch.textContent = '✓'; }
+  else { delete WP_CHECKED[name]; if (ch) ch.textContent = ''; }
+  wpSave();
+}
+function closeShop(evt) {
+  if (evt && evt.target && evt.target.id !== 'wp-shopmodal') return;
+  var m = document.getElementById('wp-shopmodal'); if (m) m.classList.add('hidden');
+}
+
+// Init
+wpLoad();
+setTimeout(function() { renderPlan(); }, 150);
+
+
+
+function openPantry() {
+  var m = document.getElementById('pantry-modal');
+  if (m) m.classList.remove('hidden');
+}
+function closePantry(evt) {
+  if (evt && evt.target && evt.target.id !== 'pantry-modal') return;
+  var m = document.getElementById('pantry-modal');
+  if (m) m.classList.add('hidden');
+}
+
 </script>
 
 </body>
